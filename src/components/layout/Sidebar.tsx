@@ -15,7 +15,6 @@ export default function Sidebar({
   eventoSelecionado,
   onSelectEvento,
   onSaveEvento,
-  onDeleteEvento,
   onNewEvento,
 }: SidebarProps) {
   // Inicialização direta do estado através das propriedades (props)
@@ -161,19 +160,6 @@ export default function Sidebar({
 
         <div className="form-actions">
           <button type="submit" className="btn btn-save">Salvar</button>
-          {eventoSelecionado?.id && (
-            <button
-              type="button"
-              className="btn btn-danger"
-              onClick={() => {
-                if (window.confirm('Atenção: Isso excluirá o evento e tudo associado a ele. Confirmar?')) {
-                  onDeleteEvento(eventoSelecionado.id!);
-                }
-              }}
-            >
-              Excluir
-            </button>
-          )}
         </div>
       </form>
 
