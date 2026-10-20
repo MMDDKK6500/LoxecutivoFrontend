@@ -397,10 +397,12 @@ export default function Dashboard() {
                         setViagemSelecionada(viagem);
                       }}
                       className={viagemSelecionada?.id === viagem.id ? 'active' : ''}
+                      
                       style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                     >
                       <span className="item-link">
-                        <span>Veículo: <strong>{viagem.idVeiculo}</strong></span>
+                        <span className="trip-driver">{[viagem.idMotorista?.nome, viagem.idMotorista?.sobrenome].filter(Boolean).join(' ') || 'Motorista não informado'}</span>
+                        <span className="trip-vehicle">Veículo: <strong>{viagem.idVeiculo}</strong></span>
                         <small className="trip-date">{formatarDataHora(viagem.dataHora)}</small>
                       </span>
                       
