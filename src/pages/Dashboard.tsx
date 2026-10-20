@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { apiCore } from '../services/apiCore';
 import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
@@ -56,9 +56,8 @@ export default function Dashboard() {
       apiCore.get<Passageiro[]>(`/passageiros/viagem/${viagemSelecionada.id}`)
         .then(res => setPassageirosDaViagem(res.data))
         .catch(() => setPassageirosDaViagem([])); // Fallback em caso de erro
-    } else {
-      setPassageirosDaViagem([]);
     }
+    // O bloco 'else' foi removido para evitar avisos de renders em cascata (set-state-in-effect)
   }, [viagemSelecionada]);
 
   const selecionarEvento = (eventoId: number) => {
@@ -85,7 +84,7 @@ export default function Dashboard() {
       }
       carregarEventos();
       handleNewEvento();
-    } catch (error) {
+    } catch {
       alert("Erro ao guardar o evento. Verifique os dados.");
     }
   };
@@ -95,7 +94,7 @@ export default function Dashboard() {
       await apiCore.post('/viagens', viagemPayload);
       setIsViagemModalOpen(false);
       if (eventoSelecionado) selecionarEvento(eventoSelecionado.id!); // Recarrega lista
-    } catch (error) {
+    } catch {
       alert("Erro ao salvar viagem.");
     }
   };
@@ -106,7 +105,7 @@ export default function Dashboard() {
       setIsPassageiroModalOpen(false);
       // Força a atualização da viagem selecionada para recarregar passageiros
       setViagemSelecionada({ ...viagemSelecionada } as Viagens);
-    } catch (error) {
+    } catch {
       alert("Erro ao salvar passageiro.");
     }
   };
@@ -116,7 +115,7 @@ export default function Dashboard() {
       await apiCore.post('/veiculos', veiculoPayload);
       setIsVeiculoModalOpen(false);
       carregarRecursosGlobais(); // Atualiza dropdowns
-    } catch (error) {
+    } catch {
       alert("Erro ao salvar veículo.");
     }
   };
@@ -126,7 +125,7 @@ export default function Dashboard() {
       await apiCore.post('/motoristas', motoristaPayload);
       setIsMotoristaModalOpen(false);
       carregarRecursosGlobais(); // Atualiza dropdowns
-    } catch (error) {
+    } catch {
       alert("Erro ao salvar motorista.");
     }
   };
@@ -136,7 +135,7 @@ export default function Dashboard() {
       await apiCore.delete(`/eventos/${id}`);
       carregarEventos();
       handleNewEvento();
-    } catch (error) {
+    } catch {
       alert("Erro ao excluir o evento.");
     }
   };
@@ -146,6 +145,34 @@ export default function Dashboard() {
     setViagensDoEvento([]);
     setViagemSelecionada(null);
     setPassageirosDaViagem([]);
+  };
+
+  const handleDeleteViagem = async (e: React.MouseEvent, id: number) => {
+    e.stopPropagation(); // Evita que a viagem seja selecionada ao clicar no botão de excluir
+    
+    if (!window.confirm('Tem a certeza que deseja excluir esta viagem e os seus passageiros?')) {
+      return;
+    }
+
+    try {
+      // Nota: Use a rota correspondente ao seu Java. 
+      // Se converteu para REST, será .delete(`/viagens/${id}`). 
+      // Se manteve o padrão antigo do Controller Thymeleaf, será .get(`/viagens/deletar/${id}`)
+      await apiCore.get(`/viagens/deletar/${id}`); 
+      
+      // Recarrega a lista de viagens do evento atual
+      if (eventoSelecionado) {
+        selecionarEvento(eventoSelecionado.id!);
+      }
+      
+      // Se a viagem excluída era a que estava aberta, limpa a seleção e os passageiros
+      if (viagemSelecionada?.id === id) {
+        setViagemSelecionada(null);
+        setPassageirosDaViagem([]);
+      }
+    } catch {
+      alert("Erro ao excluir a viagem.");
+    }
   };
 
   const eventosFiltrados = eventos.filter(ev => 
@@ -175,19 +202,12 @@ export default function Dashboard() {
         />
         
         <section className="content">
-          {/* Barra de Ferramentas Globais */}
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginBottom: '15px' }}>
-            <button className="btn-sm btn-edit" onClick={() => setIsMotoristaModalOpen(true)}>+ Novo Motorista</button>
-            <button className="btn-sm btn-edit" onClick={() => setIsVeiculoModalOpen(true)}>+ Novo Veículo</button>
-          </div>
-
           <div className="dashboard-grid">
             
-            {/* Card 1: Viagens do Evento */}
+{/* Card 1: Viagens do Evento */}
             <div className="card">
               <div className="card-header">
                 <h3>Viagens do Evento</h3>
-                {/* Botão de adicionar Viagem só aparece se um evento estiver selecionado */}
                 {eventoSelecionado && (
                   <button className="btn-sm btn-add" onClick={() => setIsViagemModalOpen(true)}>+ Adicionar</button>
                 )}
@@ -203,11 +223,23 @@ export default function Dashboard() {
                       key={viagem.id} 
                       onClick={() => setViagemSelecionada(viagem)}
                       className={viagemSelecionada?.id === viagem.id ? 'active' : ''}
-                      style={{ cursor: 'pointer' }}
+                      style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                     >
                       <span className="item-link">
                         Veículo: <strong>{viagem.idVeiculo}</strong>
                       </span>
+                      
+                      {/* O botão de excluir aparece aqui e aproveita o seu CSS existente */}
+                      <div className="item-actions">
+                        <button
+                          onClick={(e) => handleDeleteViagem(e, viagem.id!)}
+                          className="btn-danger-outline"
+                          style={{ padding: '2px 8px', fontSize: '0.8rem', borderRadius: '4px', cursor: 'pointer' }}
+                          title="Excluir Viagem"
+                        >
+                          Excluir
+                        </button>
+                      </div>
                     </li>
                   ))
                 )}
@@ -218,7 +250,6 @@ export default function Dashboard() {
             <div className="card">
               <div className="card-header">
                 <h3>Passageiros</h3>
-                {/* Botão de adicionar Passageiro só aparece se uma viagem estiver selecionada */}
                 {viagemSelecionada && (
                   <button className="btn-sm btn-add" onClick={() => setIsPassageiroModalOpen(true)}>+ Adicionar</button>
                 )}
@@ -245,6 +276,7 @@ export default function Dashboard() {
               <div className="card-header">
                 <h3>Transporte e Rota</h3>
               </div>
+              
               {!viagemSelecionada ? (
                 <div className="placeholder"><p>Selecione uma viagem para ver os detalhes.</p></div>
               ) : (
@@ -256,8 +288,26 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
-            </div>
 
+              {/* Botões sempre na base do cartão, empurrados para o fundo via marginTop: 'auto' */}
+              <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', paddingTop: '15px', borderTop: '1px solid #f0f2f5' }}>
+                <button 
+                  className="btn-sm btn-add" 
+                  style={{ flex: 1, padding: '8px' }} 
+                  onClick={() => setIsMotoristaModalOpen(true)}
+                >
+                  + Motorista
+                </button>
+                <button 
+                  className="btn-sm btn-add" 
+                  style={{ flex: 1, padding: '8px' }} 
+                  onClick={() => setIsVeiculoModalOpen(true)}
+                >
+                  + Veículo
+                </button>
+              </div>
+
+            </div>
           </div>
         </section>
       </div>
