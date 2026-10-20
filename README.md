@@ -1,5 +1,9 @@
 # React + TypeScript + Vite
 
+Em produção, o frontend e as APIs são servidos na mesma origem HTTPS pelo NGINX (`https://loxecutivo.mmddkk.dev.br`), portanto as chamadas do navegador não precisam de CORS. No desenvolvimento, o proxy do Vite encaminha `/api`, `/auth` e `/export` às APIs locais; as origens permitidas de desenvolvimento são configuradas nos serviços.
+
+O NGINX deve encaminhar `/auth/` para a porta 8082, `/api/` para 8081 e `/export/` para 8083, removendo o prefixo correspondente conforme o `proxy_pass` com barra final.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
