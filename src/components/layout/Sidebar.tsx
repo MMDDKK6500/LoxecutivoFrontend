@@ -61,6 +61,7 @@ export default function Sidebar({
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             placeholder="Ex: Show de Rock"
+            maxLength={40}
             required
           />
         </div>
@@ -75,6 +76,7 @@ export default function Sidebar({
             value={rua}
             onChange={(e) => setRua(e.target.value)}
             placeholder="Nome da rua"
+            maxLength={50}
             required
           />
         </div>
@@ -141,6 +143,7 @@ export default function Sidebar({
             value={bairro}
             onChange={(e) => setBairro(e.target.value)}
             required
+            maxLength={20}
           />
         </div>
 
@@ -152,6 +155,7 @@ export default function Sidebar({
             value={cidade}
             onChange={(e) => setCidade(e.target.value)}
             required
+            maxLength={20}
           />
         </div>
 

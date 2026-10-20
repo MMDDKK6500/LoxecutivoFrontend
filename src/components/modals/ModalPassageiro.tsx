@@ -40,31 +40,31 @@ export default function ModalPassageiro({ isOpen, onClose, onSave, viagemAtual, 
           <div className="form-row">
             <div className="form-group half-width">
               <label>Nome:</label>
-              <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required />
+              <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} maxLength={30} pattern="[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ '\u002D]*" required />
             </div>
             <div className="form-group half-width">
               <label>Sobrenome:</label>
-              <input type="text" value={sobrenome} onChange={(e) => setSobrenome(e.target.value)} required />
+              <input type="text" value={sobrenome} onChange={(e) => setSobrenome(e.target.value)} maxLength={60} pattern="[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ '\u002D]*" required />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group half-width">
               <label>Contacto (Telemóvel):</label>
-              <input type="text" value={numero} onChange={(e) => setNumero(e.target.value)} required />
+              <input type="text" value={numero} onChange={(e) => setNumero(e.target.value.replace(/\D/g, ''))} maxLength={14} pattern="[0-9]{1,14}" required />
             </div>
             <div className="form-group half-width">
               <label>Empresa:</label>
-              <input type="text" value={empresa} onChange={(e) => setEmpresa(e.target.value)} required />
+              <input type="text" value={empresa} onChange={(e) => setEmpresa(e.target.value)} maxLength={60} required />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group half-width">
               <label>RG:</label>
-              <input type="text" maxLength={9} value={rg} onChange={(e) => setRg(e.target.value.replace(/\D/g, ''))} required />
+              <input type="text" maxLength={9} pattern="[0-9]{9}" value={rg} onChange={(e) => setRg(e.target.value.replace(/\D/g, ''))} title="O RG deve ter 9 números." required />
             </div>
             <div className="form-group half-width">
               <label>CPF:</label>
-              <input type="text" maxLength={11} value={cpf} onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} required />
+              <input type="text" maxLength={11} pattern="[0-9]{11}" value={cpf} onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} title="O CPF deve ter 11 números." required />
             </div>
           </div>
           <div className="form-actions">

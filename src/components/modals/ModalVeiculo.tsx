@@ -37,7 +37,9 @@ export default function ModalVeiculo({ isOpen, onClose, onSave, veiculoEdit }: M
                 type="text" 
                 value={idPlaca} 
                 onChange={(e) => setIdPlaca(e.target.value.toUpperCase())} 
-                maxLength={7} 
+                maxLength={7}
+                pattern="[A-Z0-9-]{1,7}"
+                title="Use até 7 caracteres: letras, números ou hífen."
                 placeholder="ABC1D23" 
                 required 
                 disabled={!!veiculoEdit} // A placa é o ID no Java, não deve mudar na edição
@@ -45,13 +47,13 @@ export default function ModalVeiculo({ isOpen, onClose, onSave, veiculoEdit }: M
             </div>
             <div className="form-group half-width">
               <label>Ano:</label>
-              <input type="number" value={ano} onChange={(e) => setAno(Number(e.target.value))} min="1950" required />
+              <input type="number" value={ano} onChange={(e) => setAno(e.target.value === '' ? '' : Number(e.target.value))} min="1950" max="2100" required />
             </div>
           </div>
           <div className="form-row">
             <div className="form-group half-width">
               <label>Marca:</label>
-              <input type="text" value={marca} onChange={(e) => setMarca(e.target.value)} placeholder="Ex: Mercedes" required />
+              <input type="text" value={marca} onChange={(e) => setMarca(e.target.value)} placeholder="Ex: Mercedes" maxLength={20} required />
             </div>
             <div className="form-group half-width">
               <label>Modelo:</label>
@@ -60,7 +62,7 @@ export default function ModalVeiculo({ isOpen, onClose, onSave, veiculoEdit }: M
           </div>
           <div className="form-group">
             <label>Cor:</label>
-            <input type="text" value={cor} onChange={(e) => setCor(e.target.value)} placeholder="Ex: Prata" required />
+            <input type="text" value={cor} onChange={(e) => setCor(e.target.value)} placeholder="Ex: Prata" maxLength={20} required />
           </div>
           <div className="form-actions">
             <button type="button" className="btn btn-cancel" onClick={onClose}>Cancelar</button>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiCore } from '../services/apiCore';
+import axios from 'axios';
 import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
 import type { Evento, Viagens, Passageiro, Endereco, Motorista, Veiculo } from '../types';
@@ -12,6 +13,13 @@ import ModalMotorista from '../components/modals/ModalMotorista';
 import { FiEdit2, FiPlus, FiTrash2, FiUserPlus, FiTruck } from 'react-icons/fi';
 
 export default function Dashboard() {
+  const apiErrorMessage = (error: unknown, fallback: string) => {
+    if (axios.isAxiosError(error)) {
+      const message = error.response?.data?.message;
+      if (typeof message === 'string' && message.length > 0) return message;
+    }
+    return fallback;
+  };
   // Estados principais
   const [eventos, setEventos] = useState<Evento[]>([]);
   const [eventoSelecionado, setEventoSelecionado] = useState<Evento | null>(null);
@@ -106,8 +114,8 @@ export default function Dashboard() {
       }
       carregarEventos();
       handleNewEvento();
-    } catch {
-      alert("Erro ao guardar o evento. Verifique os dados.");
+    } catch (error) {
+      alert(apiErrorMessage(error, "Erro ao guardar o evento. Verifique os dados."));
     }
   };
 
@@ -125,8 +133,8 @@ export default function Dashboard() {
         const viagemAtualizada = result.viagens.find(item => item.id === viagemPayload.id);
         if (result.isCurrent && viagemAtualizada) setViagemSelecionada(viagemAtualizada);
       }
-    } catch {
-      alert("Erro ao salvar viagem.");
+    } catch (error) {
+      alert(apiErrorMessage(error, "Erro ao salvar viagem. Verifique os dados selecionados."));
     }
   };
 
@@ -140,8 +148,8 @@ export default function Dashboard() {
       setIsPassageiroModalOpen(false);
       setPassageiroEmEdicao(null);
       setPassageirosReload((current) => current + 1);
-    } catch {
-      alert("Erro ao salvar passageiro.");
+    } catch (error) {
+      alert(apiErrorMessage(error, "Erro ao salvar passageiro. Verifique os dados."));
     }
   };
 
@@ -150,8 +158,8 @@ export default function Dashboard() {
     try {
       await apiCore.delete(`/passageiros/${id}`);
       setPassageirosReload((current) => current + 1);
-    } catch {
-      alert('Erro ao excluir passageiro.');
+    } catch (error) {
+      alert(apiErrorMessage(error, 'Erro ao excluir passageiro.'));
     }
   };
 
@@ -160,8 +168,8 @@ export default function Dashboard() {
       await apiCore.post('/veiculos', veiculoPayload);
       setIsVeiculoModalOpen(false);
       carregarRecursosGlobais(); // Atualiza dropdowns
-    } catch {
-      alert("Erro ao salvar veículo.");
+    } catch (error) {
+      alert(apiErrorMessage(error, "Erro ao salvar veículo. Verifique placa, ano e campos obrigatórios."));
     }
   };
 
@@ -170,8 +178,8 @@ export default function Dashboard() {
       await apiCore.post('/motoristas', motoristaPayload);
       setIsMotoristaModalOpen(false);
       carregarRecursosGlobais(); // Atualiza dropdowns
-    } catch {
-      alert("Erro ao salvar motorista.");
+    } catch (error) {
+      alert(apiErrorMessage(error, "Erro ao salvar motorista. Verifique nome, RG e CPF."));
     }
   };
 
