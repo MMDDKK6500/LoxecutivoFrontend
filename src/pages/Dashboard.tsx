@@ -10,7 +10,8 @@ import ModalViagem from '../components/modals/ModalViagem';
 import ModalPassageiro from '../components/modals/ModalPassageiro';
 import ModalVeiculo from '../components/modals/ModalVeiculo';
 import ModalMotorista from '../components/modals/ModalMotorista';
-import { FiEdit2, FiPlus, FiTrash2, FiUserPlus, FiTruck } from 'react-icons/fi';
+import ModalEndereco from '../components/modals/ModalEndereco';
+import { FiEdit2, FiPlus, FiTrash2, FiUserPlus, FiTruck, FiMapPin } from 'react-icons/fi';
 
 export default function Dashboard() {
   const apiErrorMessage = (error: unknown, fallback: string) => {
@@ -37,6 +38,7 @@ export default function Dashboard() {
   const [isPassageiroModalOpen, setIsPassageiroModalOpen] = useState(false);
   const [isVeiculoModalOpen, setIsVeiculoModalOpen] = useState(false);
   const [isMotoristaModalOpen, setIsMotoristaModalOpen] = useState(false);
+  const [isEnderecoModalOpen, setIsEnderecoModalOpen] = useState(false);
   const [passageiroEmEdicao, setPassageiroEmEdicao] = useState<Passageiro | null>(null);
 
   // Estados de Dados Auxiliares (Para os selects do Modal de Viagem)
@@ -180,6 +182,16 @@ export default function Dashboard() {
       carregarRecursosGlobais(); // Atualiza dropdowns
     } catch (error) {
       alert(apiErrorMessage(error, "Erro ao salvar motorista. Verifique nome, RG e CPF."));
+    }
+  };
+
+  const handleSaveEndereco = async (enderecoPayload: Endereco) => {
+    try {
+      await apiCore.post('/enderecos', enderecoPayload);
+      setIsEnderecoModalOpen(false);
+      carregarRecursosGlobais();
+    } catch (error) {
+      alert(apiErrorMessage(error, 'Erro ao salvar endereço. Verifique os campos obrigatórios.'));
     }
   };
 
@@ -408,7 +420,7 @@ export default function Dashboard() {
               )}
 
               {/* Botões sempre na base do cartão, empurrados para o fundo via marginTop: 'auto' */}
-              <div style={{ display: 'flex', gap: '10px', marginTop: 'auto', paddingTop: '15px', borderTop: '1px solid #f0f2f5' }}>
+              <div className="logistics-actions" style={{ marginTop: 'auto', paddingTop: '15px', borderTop: '1px solid #f0f2f5' }}>
                 <button 
                   className="btn-sm btn-add" 
                   style={{ flex: 1, padding: '8px' }} 
@@ -422,6 +434,13 @@ export default function Dashboard() {
                   onClick={() => setIsVeiculoModalOpen(true)}
                 >
                   <FiTruck /> Veículo
+                </button>
+                <button
+                  className="btn-sm btn-add"
+                  style={{ flex: 1, padding: '8px' }}
+                  onClick={() => setIsEnderecoModalOpen(true)}
+                >
+                  <FiMapPin /> Endereço
                 </button>
               </div>
 
@@ -464,6 +483,12 @@ export default function Dashboard() {
         isOpen={isMotoristaModalOpen} 
         onClose={() => setIsMotoristaModalOpen(false)} 
         onSave={handleSaveMotorista} 
+      />}
+
+      {isEnderecoModalOpen && <ModalEndereco
+        isOpen={isEnderecoModalOpen}
+        onClose={() => setIsEnderecoModalOpen(false)}
+        onSave={handleSaveEndereco}
       />}
 
     </div>

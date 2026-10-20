@@ -371,6 +371,11 @@ body {
   transition: opacity 0.2s;
 }
 
+.logistics-actions {
+  display: flex;
+  gap: 10px;
+}
+
 .item-list li:hover .item-actions {
   opacity: 1;
 }
@@ -719,6 +724,10 @@ section {
 }
 
 @media (max-width: 900px) {
+  .logistics-actions {
+    flex-wrap: wrap;
+  }
+
   .logistics-grid {
     grid-template-columns: 1fr;
   }
