@@ -178,6 +178,28 @@ body {
   color: white;
 }
 
+.navbar-navigation {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.navbar-link {
+  color: #d7e0e8;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.navbar-link:hover,
+.navbar-link.active {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
 .navbar .search-box input {
   padding: 8px 15px;
   border-radius: 20px;
@@ -306,6 +328,113 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+}
+
+.records-content {
+  overflow: auto;
+  min-height: 0;
+}
+
+.records-card {
+  width: 100%;
+  max-width: 1100px;
+  align-self: center;
+}
+
+.records-header {
+  gap: 16px;
+}
+
+.records-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.records-heading-icon {
+  width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  border-radius: 10px;
+  background: #ebf8ff;
+  color: #2b6cb0;
+  font-size: 1.2rem;
+}
+
+.records-heading h3 {
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+}
+
+.records-heading p {
+  color: #718096;
+  font-size: 0.84rem;
+}
+
+.btn-refresh {
+  background-color: #64748b;
+}
+
+.btn-refresh:hover {
+  background-color: #475569;
+}
+
+.records-list {
+  overflow-y: auto;
+}
+
+.records-list .record-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 8px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.record-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.record-copy > strong {
+  color: #2d3748;
+  font-size: 0.97rem;
+}
+
+.record-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  color: #718096;
+  font-size: 0.84rem;
+}
+
+.record-actions {
+  opacity: 1;
+  flex: none;
+}
+
+.records-message {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.records-error {
+  color: #c53030;
 }
 
 .btn-sm {
@@ -750,7 +879,27 @@ section {
   min-height: 0;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 18px;
+  }
+
+  .navbar-navigation {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .navbar-link {
+    white-space: nowrap;
+  }
+
+  .navbar .search-box input {
+    width: min(32vw, 220px);
+  }
+
   .logistics-actions {
     flex-wrap: wrap;
   }
@@ -777,5 +926,25 @@ section {
     border-bottom: none;
     padding-bottom: 0;
     margin-bottom: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .content.records-content {
+    padding: 14px;
+  }
+
+  .records-card {
+    padding: 14px;
+  }
+
+  .records-list .record-row {
+    align-items: flex-start;
+    padding: 12px 4px;
+  }
+
+  .records-heading-icon {
+    width: 36px;
+    height: 36px;
   }
 }

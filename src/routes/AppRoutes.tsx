@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 import { useState } from 'react';
 import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
+import Cadastros from '../pages/Cadastros';
 
 // Componente para verificar se o token JWT existe no localStorage
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -26,14 +27,10 @@ export default function AppRoutes() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route 
-          path="/*" 
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          } 
-        />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+        <Route path="/cadastros/:tipo" element={<PrivateRoute><Cadastros /></PrivateRoute>} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );

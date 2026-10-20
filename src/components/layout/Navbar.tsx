@@ -1,4 +1,5 @@
 import { FaSearch, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
+import { NavLink } from 'react-router-dom';
 
 interface NavbarProps {
   searchTerm?: string;
@@ -11,6 +12,13 @@ export default function Navbar({ searchTerm, onSearchChange, onLogout }: NavbarP
     <nav className="navbar">
       <div className="navbar-brand">
         <span style={{ fontWeight: 600, fontSize: '1.1rem' }}>Gestão de Transporte & Logística</span>
+      </div>
+
+      <div className="navbar-navigation" aria-label="Navegação principal">
+        <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Dashboard</NavLink>
+        <NavLink to="/cadastros/motoristas" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Motoristas</NavLink>
+        <NavLink to="/cadastros/veiculos" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Veículos</NavLink>
+        <NavLink to="/cadastros/enderecos" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Endereços</NavLink>
       </div>
 
       <div className="search-box" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>

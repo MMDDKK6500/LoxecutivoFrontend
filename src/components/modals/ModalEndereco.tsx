@@ -5,28 +5,29 @@ interface ModalEnderecoProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (endereco: Endereco) => void;
+  enderecoEdit?: Endereco | null;
 }
 
-export default function ModalEndereco({ isOpen, onClose, onSave }: ModalEnderecoProps) {
-  const [rua, setRua] = useState('');
-  const [numero, setNumero] = useState<number | ''>('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [uf, setUf] = useState('');
+export default function ModalEndereco({ isOpen, onClose, onSave, enderecoEdit }: ModalEnderecoProps) {
+  const [rua, setRua] = useState(enderecoEdit?.rua ?? '');
+  const [numero, setNumero] = useState<number | ''>(enderecoEdit?.numero ?? '');
+  const [bairro, setBairro] = useState(enderecoEdit?.bairro ?? '');
+  const [cidade, setCidade] = useState(enderecoEdit?.cidade ?? '');
+  const [uf, setUf] = useState(enderecoEdit?.uf ?? '');
 
   if (!isOpen) return null;
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (numero === '') return;
-    onSave({ rua, numero: Number(numero), bairro, cidade, uf: uf.toUpperCase() });
+    onSave({ id: enderecoEdit?.id, rua, numero: Number(numero), bairro, cidade, uf: uf.toUpperCase() });
   };
 
   return (
     <div className="modal-overlay active">
       <div className="modal-content modal-large">
         <div className="modal-header">
-          <h2>Novo Endereço</h2>
+          <h2>{enderecoEdit ? 'Editar Endereço' : 'Novo Endereço'}</h2>
           <button type="button" className="close-btn" aria-label="Fechar" title="Fechar" onClick={onClose}>×</button>
         </div>
         <form onSubmit={handleSubmit}>
@@ -67,7 +68,7 @@ export default function ModalEndereco({ isOpen, onClose, onSave }: ModalEndereco
           </div>
           <div className="form-actions">
             <button type="button" className="btn btn-cancel" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="btn btn-save">Salvar Endereço</button>
+            <button type="submit" className="btn btn-save">{enderecoEdit ? 'Salvar Alterações' : 'Salvar Endereço'}</button>
           </div>
         </form>
       </div>
