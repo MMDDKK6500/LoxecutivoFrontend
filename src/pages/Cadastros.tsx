@@ -8,6 +8,7 @@ import ModalMotorista from '../components/modals/ModalMotorista';
 import ModalVeiculo from '../components/modals/ModalVeiculo';
 import { apiCore } from '../services/apiCore';
 import type { Endereco, Motorista, Veiculo } from '../types';
+import { formatCpf, formatRg } from '../utils/masks';
 
 type CadastroKind = 'motoristas' | 'veiculos' | 'enderecos';
 type CadastroItem = Motorista | Veiculo | Endereco;
@@ -48,7 +49,7 @@ function recordTitle(kind: CadastroKind, item: CadastroItem) {
 function recordDetails(kind: CadastroKind, item: CadastroItem) {
   if (kind === 'motoristas') {
     const driver = item as Motorista;
-    return [`CPF: ${driver.cpf}`, `RG: ${driver.rg}`];
+    return [`CPF: ${formatCpf(driver.cpf)}`, `RG: ${formatRg(driver.rg)}`];
   }
   if (kind === 'veiculos') {
     const vehicle = item as Veiculo;

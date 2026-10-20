@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Motorista } from '../../types';
+import { digitsOnly, formatCpf, formatRg } from '../../utils/masks';
 
 interface ModalMotoristaProps {
   isOpen: boolean;
@@ -11,8 +12,8 @@ interface ModalMotoristaProps {
 export default function ModalMotorista({ isOpen, onClose, onSave, motoristaEdit }: ModalMotoristaProps) {
   const [nome, setNome] = useState(motoristaEdit?.nome ?? '');
   const [sobrenome, setSobrenome] = useState(motoristaEdit?.sobrenome ?? '');
-  const [rg, setRg] = useState(motoristaEdit?.rg ?? '');
-  const [cpf, setCpf] = useState(motoristaEdit?.cpf ?? '');
+  const [rg, setRg] = useState(digitsOnly(motoristaEdit?.rg ?? '', 9));
+  const [cpf, setCpf] = useState(digitsOnly(motoristaEdit?.cpf ?? '', 11));
 
   if (!isOpen) return null;
 
@@ -41,12 +42,12 @@ export default function ModalMotorista({ isOpen, onClose, onSave, motoristaEdit 
           </div>
           <div className="form-row">
             <div className="form-group half-width">
-              <label>RG (Apenas números):</label>
-              <input type="text" maxLength={9} pattern="[0-9]{9}" value={rg} onChange={(e) => setRg(e.target.value.replace(/\D/g, ''))} title="O RG deve ter 9 números." required />
+              <label>RG:</label>
+              <input type="text" inputMode="numeric" maxLength={12} pattern="[0-9]{2}\.[0-9]{3}\.[0-9]{3}-[0-9]" value={formatRg(rg)} onChange={(e) => setRg(digitsOnly(e.target.value, 9))} placeholder="55.226.568-8" title="O RG deve ter 9 números." required />
             </div>
             <div className="form-group half-width">
-              <label>CPF (Apenas números):</label>
-              <input type="text" maxLength={11} pattern="[0-9]{11}" value={cpf} onChange={(e) => setCpf(e.target.value.replace(/\D/g, ''))} title="O CPF deve ter 11 números." required />
+              <label>CPF:</label>
+              <input type="text" inputMode="numeric" maxLength={14} pattern="[0-9]{3}\.[0-9]{3}\.[0-9]{3}-[0-9]{2}" value={formatCpf(cpf)} onChange={(e) => setCpf(digitsOnly(e.target.value, 11))} placeholder="390.914.958-80" title="O CPF deve ter 11 números." required />
             </div>
           </div>
           <div className="form-actions">

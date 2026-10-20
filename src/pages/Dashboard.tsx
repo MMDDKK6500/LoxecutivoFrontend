@@ -5,6 +5,7 @@ import axios from 'axios';
 import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
 import type { Evento, Viagens, Passageiro, Endereco, Motorista, Veiculo } from '../types';
+import { formatCpf, formatRg } from '../utils/masks';
 
 // Importação dos Modais
 import ModalViagem from '../components/modals/ModalViagem';
@@ -485,11 +486,11 @@ export default function Dashboard() {
                       </div>
                       <div className="logistics-item">
                         <span className="logistics-label">CPF</span>
-                        <span>{motoristaDaViagem?.cpf || 'Não informado'}</span>
+                        <span>{motoristaDaViagem?.cpf ? formatCpf(motoristaDaViagem.cpf) : 'Não informado'}</span>
                       </div>
                       <div className="logistics-item">
                         <span className="logistics-label">RG</span>
-                        <span>{motoristaDaViagem?.rg || 'Não informado'}</span>
+                        <span>{motoristaDaViagem?.rg ? formatRg(motoristaDaViagem.rg) : 'Não informado'}</span>
                       </div>
                       <div className="logistics-item">
                         <span className="logistics-label">Veículo</span>
