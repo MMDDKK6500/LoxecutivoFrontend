@@ -177,7 +177,7 @@ export default function GlobalSearch({ value, onChange }: GlobalSearchProps) {
         type: 'motorista' as const,
         label: 'Motorista',
         title: driverName(motorista),
-        description: `CPF ${formatCpf(motorista.cpf)} · RG ${formatRg(motorista.rg)}`,
+        description: `CPF ${formatCpf(motorista.cpf) || 'não informado'} · RG ${formatRg(motorista.rg) || 'não informado'}`,
         target: `/cadastros/motoristas?q=${encodeURIComponent(driverName(motorista))}`,
       }));
 

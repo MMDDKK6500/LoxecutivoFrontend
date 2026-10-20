@@ -1,23 +1,23 @@
-export function digitsOnly(value: string, maxLength?: number) {
-  const digits = value.replace(/\D/g, '');
+export function digitsOnly(value: unknown, maxLength?: number) {
+  const digits = String(value ?? '').replace(/\D/g, '');
   return maxLength === undefined ? digits : digits.slice(0, maxLength);
 }
 
-export function formatCpf(value: string) {
+export function formatCpf(value: unknown) {
   return digitsOnly(value, 11)
     .replace(/^(\d{3})(\d)/, '$1.$2')
     .replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
     .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
 }
 
-export function formatRg(value: string) {
+export function formatRg(value: unknown) {
   return digitsOnly(value, 9)
     .replace(/^(\d{2})(\d)/, '$1.$2')
     .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
     .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
 }
 
-export function formatPhone(value: string) {
+export function formatPhone(value: unknown) {
   const digits = digitsOnly(value, 11);
   if (!digits) return '';
   if (digits.length <= 2) return `(${digits}`;

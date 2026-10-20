@@ -49,7 +49,10 @@ function recordTitle(kind: CadastroKind, item: CadastroItem) {
 function recordDetails(kind: CadastroKind, item: CadastroItem) {
   if (kind === 'motoristas') {
     const driver = item as Motorista;
-    return [`CPF: ${formatCpf(driver.cpf)}`, `RG: ${formatRg(driver.rg)}`];
+    return [
+      `CPF: ${formatCpf(driver.cpf) || 'Não informado'}`,
+      `RG: ${formatRg(driver.rg) || 'Não informado'}`,
+    ];
   }
   if (kind === 'veiculos') {
     const vehicle = item as Veiculo;
