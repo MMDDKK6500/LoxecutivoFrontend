@@ -366,6 +366,7 @@ body {
 
 .btn-danger { background-color: #e74c3c; color: white; }
 .btn-danger:hover { background-color: #c0392b; }
+.evento-actions { display: flex; flex-direction: column; gap: 8px; }
 
 .btn-danger-outline { border: 1px solid #e74c3c; color: #e74c3c; background: transparent; }
 .icon-btn.btn-danger-outline { color: #e74c3c; }

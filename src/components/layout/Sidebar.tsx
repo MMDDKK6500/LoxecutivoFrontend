@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FiTrash2 } from 'react-icons/fi';
 import type { Evento, Endereco } from '../../types';
 
 interface SidebarProps {
@@ -15,6 +16,7 @@ export default function Sidebar({
   eventoSelecionado,
   onSelectEvento,
   onSaveEvento,
+  onDeleteEvento,
   onNewEvento,
 }: SidebarProps) {
   // Inicialização direta do estado através das propriedades (props)
@@ -191,9 +193,22 @@ export default function Sidebar({
       <hr className="divider" />
 
       {eventoSelecionado?.id && (
-        <button type="button" className="btn btn-save btn-new" onClick={onNewEvento}>
-          Criar novo evento
-        </button>
+        <div className="evento-actions">
+          <button type="button" className="btn btn-save btn-new" onClick={onNewEvento}>
+            Criar novo evento
+          </button>
+          <button
+            type="button"
+            className="btn btn-danger btn-new"
+            onClick={() => {
+              if (window.confirm(`Tem certeza que deseja excluir o evento "${eventoSelecionado.nome}"?`)) {
+                onDeleteEvento(eventoSelecionado.id!);
+              }
+            }}
+          >
+            <FiTrash2 aria-hidden="true" /> Excluir evento
+          </button>
+        </div>
       )}
     </aside>
   );
