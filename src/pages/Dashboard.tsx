@@ -19,6 +19,7 @@ export default function Dashboard() {
       const message = error.response?.data?.message;
       if (typeof message === 'string' && message.length > 0) return message;
     }
+    if (error instanceof Error && error.message.length > 0) return error.message;
     return fallback;
   };
   // Estados principais
@@ -54,10 +55,20 @@ export default function Dashboard() {
       .catch(error => console.error("Erro ao carregar eventos:", error));
   };
 
-  const carregarRecursosGlobais = () => {
-    apiCore.get<Endereco[]>('/enderecos').then(res => setEnderecos(res.data)).catch(() => {});
-    apiCore.get<Motorista[]>('/motoristas').then(res => setMotoristas(res.data)).catch(() => {});
-    apiCore.get<Veiculo[]>('/veiculos').then(res => setVeiculos(res.data)).catch(() => {});
+  const carregarRecursosGlobais = async () => {
+    const [enderecosResponse, motoristasResponse, veiculosResponse] = await Promise.all([
+      apiCore.get<Endereco[]>('/enderecos'),
+      apiCore.get<Motorista[]>('/motoristas'),
+      apiCore.get<Veiculo[]>('/veiculos'),
+    ]);
+    setEnderecos(enderecosResponse.data);
+    setMotoristas(motoristasResponse.data);
+    setVeiculos(veiculosResponse.data);
+    return {
+      enderecos: enderecosResponse.data,
+      motoristas: motoristasResponse.data,
+      veiculos: veiculosResponse.data,
+    };
   };
 
   const carregarViagensDoEvento = async (eventoId: number) => {
@@ -81,7 +92,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     carregarEventos();
-    carregarRecursosGlobais();
+    void Promise.resolve().then(() => carregarRecursosGlobais());
   }, []);
 
   // Quando seleciona uma viagem, tenta buscar os passageiros dela
@@ -118,6 +129,7 @@ export default function Dashboard() {
       const eventoSalvo = response.data;
       const eventosAtualizados = await apiCore.get<Evento[]>('/eventos');
       setEventos(eventosAtualizados.data);
+      await carregarRecursosGlobais();
       if (eventoSalvo.id) {
         setEventoSelecionado(eventoSalvo);
         setViagemSelecionada(null);
@@ -131,10 +143,22 @@ export default function Dashboard() {
 
   const handleSaveViagem = async (viagemPayload: Viagens) => {
     try {
+      const recursos = await carregarRecursosGlobais();
+      const origemAtual = recursos.enderecos.find(endereco => endereco.id === viagemPayload.localDeOrigem?.id);
+      const destinoAtual = recursos.enderecos.find(endereco => endereco.id === viagemPayload.localDeDestino?.id);
+      const motoristaAtual = recursos.motoristas.find(motorista => motorista.id === viagemPayload.idMotorista?.id);
+      const veiculoAtual = recursos.veiculos.find(veiculo => veiculo.idPlaca === viagemPayload.idVeiculo);
+      if (!origemAtual || !destinoAtual) {
+        throw new Error('O endereço de origem ou destino não existe mais. Cadastre ou selecione um endereço atualizado.');
+      }
+      if (!motoristaAtual || !veiculoAtual) {
+        throw new Error('O motorista ou veículo selecionado não existe mais. Atualize os recursos e tente novamente.');
+      }
+      const payloadAtualizado = { ...viagemPayload, localDeOrigem: origemAtual, localDeDestino: destinoAtual, idMotorista: motoristaAtual, idVeiculo: veiculoAtual.idPlaca };
       if (viagemPayload.id) {
-        await apiCore.put(`/viagens/${viagemPayload.id}`, viagemPayload);
+        await apiCore.put(`/viagens/${viagemPayload.id}`, payloadAtualizado);
       } else {
-        await apiCore.post('/viagens', viagemPayload);
+        await apiCore.post('/viagens', payloadAtualizado);
       }
       setIsViagemModalOpen(false);
       setViagemEmEdicao(null);
@@ -177,7 +201,7 @@ export default function Dashboard() {
     try {
       await apiCore.post('/veiculos', veiculoPayload);
       setIsVeiculoModalOpen(false);
-      carregarRecursosGlobais(); // Atualiza dropdowns
+      void carregarRecursosGlobais(); // Atualiza dropdowns
     } catch (error) {
       alert(apiErrorMessage(error, "Erro ao salvar veículo. Verifique placa, ano e campos obrigatórios."));
     }
@@ -187,7 +211,7 @@ export default function Dashboard() {
     try {
       await apiCore.post('/motoristas', motoristaPayload);
       setIsMotoristaModalOpen(false);
-      carregarRecursosGlobais(); // Atualiza dropdowns
+      void carregarRecursosGlobais(); // Atualiza dropdowns
     } catch (error) {
       alert(apiErrorMessage(error, "Erro ao salvar motorista. Verifique nome, RG e CPF."));
     }
@@ -197,7 +221,7 @@ export default function Dashboard() {
     try {
       await apiCore.post('/enderecos', enderecoPayload);
       setIsEnderecoModalOpen(false);
-      carregarRecursosGlobais();
+      void carregarRecursosGlobais();
     } catch (error) {
       alert(apiErrorMessage(error, 'Erro ao salvar endereço. Verifique os campos obrigatórios.'));
     }
@@ -208,8 +232,8 @@ export default function Dashboard() {
       await apiCore.delete(`/eventos/${id}`);
       carregarEventos();
       handleNewEvento();
-    } catch {
-      alert("Erro ao excluir o evento.");
+    } catch (error) {
+      alert(apiErrorMessage(error, "Erro ao excluir o evento."));
     }
   };
 
