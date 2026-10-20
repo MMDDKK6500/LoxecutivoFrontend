@@ -9,6 +9,7 @@ import ModalVeiculo from '../components/modals/ModalVeiculo';
 import { apiCore } from '../services/apiCore';
 import type { Endereco, Motorista, Veiculo } from '../types';
 import { formatCpf, formatRg } from '../utils/masks';
+import { useToast } from '../contexts/useToast';
 
 type CadastroKind = 'motoristas' | 'veiculos' | 'enderecos';
 type CadastroItem = Motorista | Veiculo | Endereco;
@@ -66,6 +67,7 @@ export default function Cadastros() {
   const { tipo } = useParams<{ tipo: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const notify = useToast();
   const kind = tipo as CadastroKind;
   const validKind = tipo === 'motoristas' || tipo === 'veiculos' || tipo === 'enderecos';
   const info = validKind ? cadastroInfo[kind] : null;
@@ -131,10 +133,13 @@ export default function Cadastros() {
     setSaving(true);
     try {
       const id = editing ? recordId(kind, editing) : undefined;
+      const entity = info.singular[0].toLocaleUpperCase('pt-BR') + info.singular.slice(1);
       if (id !== undefined && id !== null) {
         await apiCore.put(`/${kind}/${encodeURIComponent(String(id))}`, item);
+        notify(`${entity} atualizado com sucesso!`);
       } else {
         await apiCore.post(`/${kind}`, item);
+        notify(`${entity} cadastrado com sucesso!`);
       }
       setModalOpen(false);
       setEditing(null);
@@ -152,6 +157,7 @@ export default function Cadastros() {
     if (!window.confirm(`Excluir ${info.singular} "${recordTitle(kind, item)}"?`)) return;
     try {
       await apiCore.delete(`/${kind}/${encodeURIComponent(String(id))}`);
+      notify(`${info.singular[0].toLocaleUpperCase('pt-BR')}${info.singular.slice(1)} excluído com sucesso!`);
       await loadItems();
     } catch (error) {
       window.alert(errorMessage(error, `Não foi possível excluir o ${info.singular}. Pode haver viagens ou eventos usando este cadastro.`));

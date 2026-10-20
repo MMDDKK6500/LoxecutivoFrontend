@@ -7,6 +7,7 @@ import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
 import type { Evento, Viagens, Passageiro, Endereco, Motorista, Veiculo } from '../types';
 import { formatCpf, formatRg } from '../utils/masks';
+import { useToast } from '../contexts/useToast';
 
 // Importação dos Modais
 import ModalViagem from '../components/modals/ModalViagem';
@@ -19,6 +20,7 @@ import { FiDownload, FiEdit2, FiFileText, FiPlus, FiTrash2, FiUserPlus, FiTruck,
 export default function Dashboard() {
   const location = useLocation();
   const navigate = useNavigate();
+  const notify = useToast();
   const apiErrorMessage = (error: unknown, fallback: string) => {
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.message;
@@ -158,6 +160,7 @@ export default function Dashboard() {
         response = await apiCore.post<Evento>('/eventos', eventoPayload);
       }
       const eventoSalvo = response.data;
+      notify(eventoPayload.id ? 'Evento atualizado com sucesso!' : 'Evento cadastrado com sucesso!');
       const eventosAtualizados = await apiCore.get<Evento[]>('/eventos');
       setEventos(eventosAtualizados.data);
       await carregarRecursosGlobais();
@@ -188,8 +191,10 @@ export default function Dashboard() {
       const payloadAtualizado = { ...viagemPayload, localDeOrigem: origemAtual, localDeDestino: destinoAtual, idMotorista: motoristaAtual, idVeiculo: veiculoAtual.idPlaca };
       if (viagemPayload.id) {
         await apiCore.put(`/viagens/${viagemPayload.id}`, payloadAtualizado);
+        notify('Viagem atualizada com sucesso!');
       } else {
         await apiCore.post('/viagens', payloadAtualizado);
+        notify('Viagem cadastrada com sucesso!');
       }
       setIsViagemModalOpen(false);
       setViagemEmEdicao(null);
@@ -207,8 +212,10 @@ export default function Dashboard() {
     try {
       if (passageiroPayload.id) {
         await apiCore.put(`/passageiros/${passageiroPayload.id}`, passageiroPayload);
+        notify('Passageiro atualizado com sucesso!');
       } else {
         await apiCore.post('/passageiros', passageiroPayload);
+        notify('Passageiro cadastrado com sucesso!');
       }
       setIsPassageiroModalOpen(false);
       setPassageiroEmEdicao(null);
@@ -222,6 +229,7 @@ export default function Dashboard() {
     if (!window.confirm('Excluir este passageiro da viagem?')) return;
     try {
       await apiCore.delete(`/passageiros/${id}`);
+      notify('Passageiro excluído com sucesso!');
       setPassageirosReload((current) => current + 1);
     } catch (error) {
       alert(apiErrorMessage(error, 'Erro ao excluir passageiro.'));
@@ -231,6 +239,7 @@ export default function Dashboard() {
   const handleSaveVeiculo = async (veiculoPayload: Veiculo) => {
     try {
       await apiCore.post('/veiculos', veiculoPayload);
+      notify('Veículo cadastrado com sucesso!');
       setIsVeiculoModalOpen(false);
       void carregarRecursosGlobais(); // Atualiza dropdowns
     } catch (error) {
@@ -241,6 +250,7 @@ export default function Dashboard() {
   const handleSaveMotorista = async (motoristaPayload: Motorista) => {
     try {
       await apiCore.post('/motoristas', motoristaPayload);
+      notify('Motorista cadastrado com sucesso!');
       setIsMotoristaModalOpen(false);
       void carregarRecursosGlobais(); // Atualiza dropdowns
     } catch (error) {
@@ -251,6 +261,7 @@ export default function Dashboard() {
   const handleSaveEndereco = async (enderecoPayload: Endereco) => {
     try {
       await apiCore.post('/enderecos', enderecoPayload);
+      notify('Endereço cadastrado com sucesso!');
       setIsEnderecoModalOpen(false);
       void carregarRecursosGlobais();
     } catch (error) {
@@ -261,6 +272,7 @@ export default function Dashboard() {
   const handleDeleteEvento = async (id: number) => {
     try {
       await apiCore.delete(`/eventos/${id}`);
+      notify('Evento excluído com sucesso!');
       carregarEventos();
       handleNewEvento();
     } catch (error) {
@@ -290,6 +302,7 @@ export default function Dashboard() {
       link.click();
       link.remove();
       URL.revokeObjectURL(fileUrl);
+      notify(`Relatório ${format === 'excel' ? 'Excel' : 'PDF'} exportado com sucesso!`);
     } catch (error) {
       const formatName = format === 'excel' ? 'Excel' : 'PDF';
       let message = apiErrorMessage(error, `Erro ao exportar o evento para ${formatName}.`);
@@ -325,6 +338,7 @@ export default function Dashboard() {
 
     try {
       await apiCore.delete(`/viagens/${id}`);
+      notify('Viagem excluída com sucesso!');
       
       // Recarrega a lista de viagens do evento atual
       if (eventoSelecionado) {
