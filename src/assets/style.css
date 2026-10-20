@@ -103,6 +103,10 @@ body {
 
 .btn {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
   padding: 10px;
   border: none;
   border-radius: 6px;
@@ -285,7 +289,10 @@ body {
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   transition: all 0.2s;
 }
 
@@ -304,7 +311,7 @@ body {
   font-weight: 700;
 }
 
-.icon-btn svg, .btn svg { width: 16px; height: 16px; stroke-width: 2.75; }
+.icon-btn svg, .btn svg, .btn-sm svg { width: 16px; height: 16px; stroke-width: 2.75; }
 .close-btn svg { stroke-width: 2.5; }
 .icon-btn:focus-visible, .btn:focus-visible { outline: 3px solid rgba(52, 152, 219, 0.35); outline-offset: 2px; }
 

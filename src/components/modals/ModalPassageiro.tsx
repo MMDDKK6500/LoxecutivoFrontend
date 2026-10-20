@@ -31,7 +31,7 @@ export default function ModalPassageiro({ isOpen, onClose, onSave, viagemAtual, 
 
   return (
     <div className="modal-overlay active">
-      <div className="modal-content">
+      <div className="modal-content modal-large">
         <div className="modal-header">
           <h2>{passageiroEdit ? 'Editar Passageiro' : 'Adicionar Passageiro'}</h2>
           <button type="button" className="close-btn" aria-label="Fechar" title="Fechar" onClick={onClose}><FiX /></button>
