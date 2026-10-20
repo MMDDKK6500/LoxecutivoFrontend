@@ -289,6 +289,12 @@ body {
   padding-bottom: 0;
 }
 
+.card-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .btn-sm {
   padding: 5px 10px;
   border-radius: 10px;
@@ -322,6 +328,7 @@ body {
 .icon-btn svg, .btn svg, .btn-sm svg { width: 16px; height: 16px; stroke-width: 2.75; }
 .close-btn svg { stroke-width: 2.5; }
 .icon-btn:focus-visible, .btn:focus-visible { outline: 3px solid rgba(52, 152, 219, 0.35); outline-offset: 2px; }
+.icon-btn:disabled { opacity: 0.65; cursor: wait; }
 
 .btn-new {
   margin-top: auto;

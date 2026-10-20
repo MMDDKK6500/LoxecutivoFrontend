@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { apiCore } from '../services/apiCore';
+import { apiExport } from '../services/apiExport';
 import axios from 'axios';
 import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
@@ -11,7 +12,7 @@ import ModalPassageiro from '../components/modals/ModalPassageiro';
 import ModalVeiculo from '../components/modals/ModalVeiculo';
 import ModalMotorista from '../components/modals/ModalMotorista';
 import ModalEndereco from '../components/modals/ModalEndereco';
-import { FiEdit2, FiPlus, FiTrash2, FiUserPlus, FiTruck, FiMapPin } from 'react-icons/fi';
+import { FiDownload, FiEdit2, FiPlus, FiTrash2, FiUserPlus, FiTruck, FiMapPin } from 'react-icons/fi';
 
 export default function Dashboard() {
   const apiErrorMessage = (error: unknown, fallback: string) => {
@@ -31,6 +32,7 @@ export default function Dashboard() {
   const [viagemEmEdicao, setViagemEmEdicao] = useState<Viagens | null>(null);
   const [passageirosDaViagem, setPassageirosDaViagem] = useState<Passageiro[]>([]);
   const [passageirosReload, setPassageirosReload] = useState(0);
+  const [exportandoEvento, setExportandoEvento] = useState(false);
   
   const [termoPesquisa, setTermoPesquisa] = useState('');
 
@@ -237,6 +239,43 @@ export default function Dashboard() {
     }
   };
 
+  const handleExportarEvento = async () => {
+    if (!eventoSelecionado?.id) return;
+
+    setExportandoEvento(true);
+    try {
+      const response = await apiExport.get(`/eventos/${eventoSelecionado.id}/excel`, {
+        responseType: 'blob',
+      });
+      const contentDisposition = response.headers['content-disposition'];
+      const fileNameMatch = typeof contentDisposition === 'string'
+        ? contentDisposition.match(/filename="?([^";]+)"?/i)
+        : null;
+      const fileName = fileNameMatch?.[1] || `evento-${eventoSelecionado.id}.xlsx`;
+      const fileUrl = URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(fileUrl);
+    } catch (error) {
+      let message = apiErrorMessage(error, 'Erro ao exportar o evento para Excel.');
+      if (axios.isAxiosError(error) && error.response?.data instanceof Blob) {
+        try {
+          const body = JSON.parse(await error.response.data.text()) as { message?: string };
+          if (body.message) message = body.message;
+        } catch {
+          // Mantém a mensagem genérica quando a resposta não for JSON.
+        }
+      }
+      alert(message);
+    } finally {
+      setExportandoEvento(false);
+    }
+  };
+
   const handleNewEvento = () => {
     viagensRequestId.current += 1;
     setEventoSelecionado(null);
@@ -318,7 +357,18 @@ export default function Dashboard() {
               <div className="card-header">
                 <h3>Viagens do Evento</h3>
                 {eventoSelecionado && (
-                  <button className="icon-btn btn-add" aria-label="Adicionar viagem" title="Adicionar viagem" onClick={() => { setViagemEmEdicao(null); setIsViagemModalOpen(true); }}><FiPlus /></button>
+                  <div className="card-header-actions">
+                    <button
+                      className="icon-btn btn-add"
+                      aria-label="Exportar evento para Excel"
+                      title={exportandoEvento ? 'Gerando Excel...' : 'Exportar evento para Excel'}
+                      onClick={() => void handleExportarEvento()}
+                      disabled={exportandoEvento}
+                    >
+                      <FiDownload />
+                    </button>
+                    <button className="icon-btn btn-add" aria-label="Adicionar viagem" title="Adicionar viagem" onClick={() => { setViagemEmEdicao(null); setIsViagemModalOpen(true); }}><FiPlus /></button>
+                  </div>
                 )}
               </div>
               
