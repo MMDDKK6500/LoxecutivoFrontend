@@ -9,6 +9,7 @@ import ModalViagem from '../components/modals/ModalViagem';
 import ModalPassageiro from '../components/modals/ModalPassageiro';
 import ModalVeiculo from '../components/modals/ModalVeiculo';
 import ModalMotorista from '../components/modals/ModalMotorista';
+import { FiEdit2, FiPlus, FiTrash2, FiUserPlus, FiTruck } from 'react-icons/fi';
 
 export default function Dashboard() {
   // Estados principais
@@ -28,6 +29,7 @@ export default function Dashboard() {
   const [isPassageiroModalOpen, setIsPassageiroModalOpen] = useState(false);
   const [isVeiculoModalOpen, setIsVeiculoModalOpen] = useState(false);
   const [isMotoristaModalOpen, setIsMotoristaModalOpen] = useState(false);
+  const [passageiroEmEdicao, setPassageiroEmEdicao] = useState<Passageiro | null>(null);
 
   // Estados de Dados Auxiliares (Para os selects do Modal de Viagem)
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
@@ -130,11 +132,26 @@ export default function Dashboard() {
 
   const handleSavePassageiro = async (passageiroPayload: Passageiro) => {
     try {
-      await apiCore.post('/passageiros', passageiroPayload);
+      if (passageiroPayload.id) {
+        await apiCore.put(`/passageiros/${passageiroPayload.id}`, passageiroPayload);
+      } else {
+        await apiCore.post('/passageiros', passageiroPayload);
+      }
       setIsPassageiroModalOpen(false);
+      setPassageiroEmEdicao(null);
       setPassageirosReload((current) => current + 1);
     } catch {
       alert("Erro ao salvar passageiro.");
+    }
+  };
+
+  const handleDeletePassageiro = async (id: number) => {
+    if (!window.confirm('Excluir este passageiro da viagem?')) return;
+    try {
+      await apiCore.delete(`/passageiros/${id}`);
+      setPassageirosReload((current) => current + 1);
+    } catch {
+      alert('Erro ao excluir passageiro.');
     }
   };
 
@@ -242,7 +259,7 @@ export default function Dashboard() {
               <div className="card-header">
                 <h3>Viagens do Evento</h3>
                 {eventoSelecionado && (
-                  <button className="btn-sm btn-add" onClick={() => { setViagemEmEdicao(null); setIsViagemModalOpen(true); }}>+ Adicionar</button>
+                  <button className="icon-btn btn-add" aria-label="Adicionar viagem" title="Adicionar viagem" onClick={() => { setViagemEmEdicao(null); setIsViagemModalOpen(true); }}><FiPlus /></button>
                 )}
               </div>
               
@@ -273,7 +290,7 @@ export default function Dashboard() {
                           style={{ padding: '2px 8px', fontSize: '0.8rem', borderRadius: '4px', cursor: 'pointer' }}
                           title="Excluir Viagem"
                         >
-                          Excluir
+                          <FiTrash2 />
                         </button>
                       </div>
                     </li>
@@ -287,7 +304,7 @@ export default function Dashboard() {
               <div className="card-header">
                 <h3>Passageiros</h3>
                 {viagemSelecionada && (
-                  <button className="btn-sm btn-add" onClick={() => setIsPassageiroModalOpen(true)}>+ Adicionar</button>
+                  <button className="icon-btn btn-add" aria-label="Adicionar passageiro" title="Adicionar passageiro" onClick={() => { setPassageiroEmEdicao(null); setIsPassageiroModalOpen(true); }}><FiUserPlus /></button>
                 )}
               </div>
               
@@ -300,6 +317,10 @@ export default function Dashboard() {
                   {passageirosDaViagem.map((passageiro) => (
                     <li key={passageiro.id}>
                       <strong>{passageiro.nome} {passageiro.sobrenome}</strong>
+                      <div className="item-actions">
+                        <button className="icon-btn btn-edit" aria-label={`Editar ${passageiro.nome}`} title="Editar passageiro" onClick={() => { setPassageiroEmEdicao(passageiro); setIsPassageiroModalOpen(true); }}><FiEdit2 /></button>
+                        <button className="icon-btn btn-danger-outline" aria-label={`Excluir ${passageiro.nome}`} title="Excluir passageiro" onClick={() => passageiro.id && handleDeletePassageiro(passageiro.id)}><FiTrash2 /></button>
+                      </div>
                     </li>
                   ))}
                 </ul>
@@ -318,7 +339,7 @@ export default function Dashboard() {
                       setIsViagemModalOpen(true);
                     }}
                   >
-                    Editar
+                    <FiEdit2 />
                   </button>
                 )}
               </div>
@@ -377,14 +398,14 @@ export default function Dashboard() {
                   style={{ flex: 1, padding: '8px' }} 
                   onClick={() => setIsMotoristaModalOpen(true)}
                 >
-                  + Motorista
+                  <FiUserPlus /> Motorista
                 </button>
                 <button 
                   className="btn-sm btn-add" 
                   style={{ flex: 1, padding: '8px' }} 
                   onClick={() => setIsVeiculoModalOpen(true)}
                 >
-                  + Veículo
+                  <FiTruck /> Veículo
                 </button>
               </div>
 
@@ -413,6 +434,7 @@ export default function Dashboard() {
           onClose={() => setIsPassageiroModalOpen(false)} 
           onSave={handleSavePassageiro}
           viagemAtual={viagemSelecionada}
+          passageiroEdit={passageiroEmEdicao}
         />
       )}
 

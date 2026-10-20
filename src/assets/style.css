@@ -288,6 +288,23 @@ body {
   transition: all 0.2s;
 }
 
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 30px;
+  min-height: 30px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+}
+
+.icon-btn svg, .btn svg { width: 16px; height: 16px; }
+.icon-btn:focus-visible, .btn:focus-visible { outline: 3px solid rgba(52, 152, 219, 0.35); outline-offset: 2px; }
+
 .btn-new {
   margin-top: auto;
   align-self: center;

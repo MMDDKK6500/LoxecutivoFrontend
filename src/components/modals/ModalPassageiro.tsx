@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Passageiro, Viagens } from '../../types';
+import { FiCheck, FiX } from 'react-icons/fi';
 
 interface ModalPassageiroProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ export default function ModalPassageiro({ isOpen, onClose, onSave, viagemAtual, 
       <div className="modal-content">
         <div className="modal-header">
           <h2>{passageiroEdit ? 'Editar Passageiro' : 'Adicionar Passageiro'}</h2>
-          <button type="button" className="close-btn" onClick={onClose}>&times;</button>
+          <button type="button" className="close-btn" aria-label="Fechar" title="Fechar" onClick={onClose}><FiX /></button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -67,8 +68,8 @@ export default function ModalPassageiro({ isOpen, onClose, onSave, viagemAtual, 
             </div>
           </div>
           <div className="form-actions">
-            <button type="button" className="btn btn-cancel" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="btn btn-save">Confirmar Passageiro</button>
+            <button type="button" className="btn btn-cancel" onClick={onClose}><FiX /> Cancelar</button>
+            <button type="submit" className="btn btn-save"><FiCheck /> {passageiroEdit ? 'Guardar alterações' : 'Confirmar passageiro'}</button>
           </div>
         </form>
       </div>
