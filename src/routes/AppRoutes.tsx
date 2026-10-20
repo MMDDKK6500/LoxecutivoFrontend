@@ -5,6 +5,7 @@ import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
 import Cadastros from '../pages/Cadastros';
 import { ToastProvider } from '../contexts/ToastContext';
+import ServiceHealthMonitor from '../components/layout/ServiceHealthMonitor';
 
 // Componente para verificar se o token JWT existe no localStorage
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -27,6 +28,7 @@ export default function AppRoutes() {
   return (
     <BrowserRouter>
       <ToastProvider>
+        <ServiceHealthMonitor />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
