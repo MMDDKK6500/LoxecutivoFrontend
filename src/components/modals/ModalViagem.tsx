@@ -17,6 +17,7 @@ export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, ende
   const [idDestino, setIdDestino] = useState<number | ''>(viagemEdit?.localDeDestino?.id ?? '');
   const [idMotorista, setIdMotorista] = useState<number | ''>(viagemEdit?.idMotorista?.id ?? '');
   const [idVeiculo, setIdVeiculo] = useState(viagemEdit?.idVeiculo ?? '');
+  const [dataHora, setDataHora] = useState(viagemEdit?.dataHora?.slice(0, 16) ?? '');
 
   if (!isOpen) return null;
 
@@ -28,14 +29,15 @@ export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, ende
     const localDeDestino = enderecos.find(end => end.id === idDestino);
     const motorista = motoristas.find(mot => mot.id === idMotorista);
 
-    if (localDeOrigem && localDeDestino && motorista && idVeiculo) {
+    if (localDeOrigem && localDeDestino && motorista && idVeiculo && dataHora) {
       onSave({
         id: viagemEdit?.id,
         localDeOrigem,
         localDeDestino,
         idMotorista: motorista,
         idVeiculo,
-        idEvento: eventoAtual
+        idEvento: eventoAtual,
+        dataHora: `${dataHora}:00`
       });
     }
   };
@@ -69,6 +71,18 @@ export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, ende
                 ))}
               </select>
             </div>
+          </div>
+
+          <h3 className="section-title" style={{ marginTop: '15px' }}>Data e horário</h3>
+          <div className="form-group">
+            <label htmlFor="dataHora">Quando acontece a viagem:</label>
+            <input
+              id="dataHora"
+              type="datetime-local"
+              value={dataHora}
+              onChange={(e) => setDataHora(e.target.value)}
+              required
+            />
           </div>
 
           <h3 className="section-title" style={{ marginTop: '15px' }}>Logística</h3>

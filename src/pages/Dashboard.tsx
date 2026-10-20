@@ -236,6 +236,13 @@ export default function Dashboard() {
   const veiculoDaViagem = viagemSelecionada
     ? veiculos.find(veiculo => veiculo.idPlaca === viagemSelecionada.idVeiculo)
     : null;
+  const formatarDataHora = (value?: string) => {
+    if (!value) return 'Data e horário não definidos';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime())
+      ? value
+      : date.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+  };
 
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
@@ -288,7 +295,8 @@ export default function Dashboard() {
                       style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                     >
                       <span className="item-link">
-                        Veículo: <strong>{viagem.idVeiculo}</strong>
+                        <span>Veículo: <strong>{viagem.idVeiculo}</strong></span>
+                        <small className="trip-date">{formatarDataHora(viagem.dataHora)}</small>
                       </span>
                       
                       <div className="item-actions">

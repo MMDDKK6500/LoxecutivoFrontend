@@ -230,6 +230,7 @@ body {
 
 .item-list li {
   border-bottom: 1px solid #f0f2f5;
+  padding: 8px;
 }
 
 .item-list li a {
@@ -241,7 +242,14 @@ body {
 }
 
 .item-list li:hover { background: #f8fafc; }
-.item-list li.active { background: #ebf8ff; border-left: 4px solid #3182ce; }
+.item-list li.active { background: #ebf8ff; border-left: 4px solid #3182ce; padding-left: 12px; }
+
+.trip-date {
+  display: block;
+  margin-top: 3px;
+  color: #718096;
+  font-size: 0.8rem;
+}
 
 .placeholder, .empty-msg {
   text-align: center;

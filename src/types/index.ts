@@ -36,6 +36,7 @@ export interface Viagens {
   idMotorista: Motorista;
   idVeiculo: string; // Guarda a placa do veículo selecionado
   idEvento?: Evento;
+  dataHora?: string;
 }
 
 export interface Passageiro {
