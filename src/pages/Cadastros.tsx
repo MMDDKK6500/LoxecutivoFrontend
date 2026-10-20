@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import { FiEdit2, FiMapPin, FiPlus, FiRefreshCw, FiTrash2, FiTruck, FiUser } from 'react-icons/fi';
 import Navbar from '../components/layout/Navbar';
@@ -62,11 +62,12 @@ function recordDetails(kind: CadastroKind, item: CadastroItem) {
 export default function Cadastros() {
   const { tipo } = useParams<{ tipo: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const kind = tipo as CadastroKind;
   const validKind = tipo === 'motoristas' || tipo === 'veiculos' || tipo === 'enderecos';
   const info = validKind ? cadastroInfo[kind] : null;
   const [items, setItems] = useState<CadastroItem[]>([]);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => searchParams.get('q') ?? '');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState('');
@@ -90,6 +91,11 @@ export default function Cadastros() {
   useEffect(() => {
     void Promise.resolve().then(loadItems);
   }, [loadItems]);
+
+  useEffect(() => {
+    const query = searchParams.get('q') ?? '';
+    void Promise.resolve().then(() => setSearch(query));
+  }, [searchParams]);
 
   const filteredItems = useMemo(() => {
     const query = search.trim().toLocaleLowerCase('pt-BR');

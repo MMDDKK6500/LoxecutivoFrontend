@@ -1,5 +1,6 @@
-import { FaSearch, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
+import { FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import { NavLink } from 'react-router-dom';
+import GlobalSearch from './GlobalSearch';
 
 interface NavbarProps {
   searchTerm?: string;
@@ -21,16 +22,7 @@ export default function Navbar({ searchTerm, onSearchChange, onLogout }: NavbarP
         <NavLink to="/cadastros/enderecos" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Endereços</NavLink>
       </div>
 
-      <div className="search-box" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
-        <input 
-          type="text" 
-          placeholder="Pesquisar..." 
-          value={searchTerm || ''}
-          onChange={(e) => onSearchChange && onSearchChange(e.target.value)}
-          style={{ paddingLeft: '35px' }}
-        />
-        <FaSearch style={{ position: 'absolute', left: '12px', color: '#a0aec0', fontSize: '0.9rem' }} />
-      </div>
+      <GlobalSearch value={searchTerm || ''} onChange={(term) => onSearchChange?.(term)} />
 
       <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem' }}>

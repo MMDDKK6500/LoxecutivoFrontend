@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useCallback, useState, useEffect, useRef } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { apiCore } from '../services/apiCore';
 import { apiExport } from '../services/apiExport';
 import axios from 'axios';
@@ -16,6 +17,8 @@ import ModalEndereco from '../components/modals/ModalEndereco';
 import { FiDownload, FiEdit2, FiFileText, FiPlus, FiTrash2, FiUserPlus, FiTruck, FiMapPin } from 'react-icons/fi';
 
 export default function Dashboard() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const apiErrorMessage = (error: unknown, fallback: string) => {
     if (axios.isAxiosError(error)) {
       const message = error.response?.data?.message;
@@ -74,7 +77,7 @@ export default function Dashboard() {
     };
   };
 
-  const carregarViagensDoEvento = async (eventoId: number) => {
+  const carregarViagensDoEvento = useCallback(async (eventoId: number) => {
     const requestId = ++viagensRequestId.current;
     try {
       const response = await apiCore.get<Viagens[]>(`/viagens/evento/${eventoId}`);
@@ -91,12 +94,36 @@ export default function Dashboard() {
       }
       return { viagens: [], isCurrent };
     }
-  };
+  }, []);
 
   useEffect(() => {
     carregarEventos();
     void Promise.resolve().then(() => carregarRecursosGlobais());
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const eventoId = Number(params.get('evento'));
+    const viagemId = Number(params.get('viagem'));
+    if (!Number.isInteger(eventoId) || eventoId <= 0 || eventos.length === 0) return;
+
+    const evento = eventos.find((item) => item.id === eventoId);
+    if (!evento) return;
+
+    let active = true;
+    void Promise.resolve().then(async () => {
+      if (!active) return;
+      setEventoSelecionado(evento);
+      setViagemSelecionada(null);
+      setPassageirosDaViagem([]);
+      const { viagens, isCurrent } = await carregarViagensDoEvento(eventoId);
+      if (!active || !isCurrent || !Number.isInteger(viagemId) || viagemId <= 0) return;
+      const viagem = viagens.find((item) => item.id === viagemId);
+      if (viagem) setViagemSelecionada(viagem);
+    });
+
+    return () => { active = false; };
+  }, [carregarViagensDoEvento, eventos, location.search]);
 
   // Quando seleciona uma viagem, tenta buscar os passageiros dela
   useEffect(() => {
@@ -112,6 +139,7 @@ export default function Dashboard() {
   }, [viagemSelecionada?.id, passageirosReload]);
 
   const selecionarEvento = (eventoId: number) => {
+    if (location.search) navigate('/dashboard', { replace: true });
     const eventoEncontrado = eventos.find(ev => ev.id === eventoId) || null;
     setEventoSelecionado(eventoEncontrado);
     setViagemSelecionada(null);
@@ -280,6 +308,7 @@ export default function Dashboard() {
   };
 
   const handleNewEvento = () => {
+    if (location.search) navigate('/dashboard', { replace: true });
     viagensRequestId.current += 1;
     setEventoSelecionado(null);
     setViagensDoEvento([]);
@@ -312,10 +341,6 @@ export default function Dashboard() {
     }
   };
 
-  const eventosFiltrados = eventos.filter(ev => 
-    ev.nome.toLowerCase().includes(termoPesquisa.toLowerCase())
-  );
-
   const motoristaDaViagem = viagemSelecionada
     ? motoristas.find(motorista => motorista.id === viagemSelecionada.idMotorista?.id) ?? viagemSelecionada.idMotorista
     : null;
@@ -334,7 +359,7 @@ export default function Dashboard() {
     <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <Sidebar 
         key={eventoSelecionado?.id || 'novo'}
-        eventos={eventosFiltrados} 
+        eventos={eventos}
         eventoSelecionado={eventoSelecionado} 
         onSelectEvento={selecionarEvento} 
         onSaveEvento={handleSaveEvento}
