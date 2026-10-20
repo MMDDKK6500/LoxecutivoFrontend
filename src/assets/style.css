@@ -498,6 +498,36 @@ body {
   border: 1px solid #e2e8f0;
 }
 
+.detail-section p {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.detail-section p + p {
+  margin-top: 8px;
+}
+
+.logistics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+}
+
+.logistics-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.logistics-label {
+  color: #718096;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 .sub-title {
   font-size: 0.75rem;
   color: #718096;
@@ -653,6 +683,10 @@ section {
 }
 
 @media (max-width: 900px) {
+  .logistics-grid {
+    grid-template-columns: 1fr;
+  }
+
   .flex-horizontal-container {
     flex-direction: column;
     gap: 0;

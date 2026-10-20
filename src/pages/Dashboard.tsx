@@ -205,6 +205,13 @@ export default function Dashboard() {
     ev.nome.toLowerCase().includes(termoPesquisa.toLowerCase())
   );
 
+  const motoristaDaViagem = viagemSelecionada
+    ? motoristas.find(motorista => motorista.id === viagemSelecionada.idMotorista?.id) ?? viagemSelecionada.idMotorista
+    : null;
+  const veiculoDaViagem = viagemSelecionada
+    ? veiculos.find(veiculo => veiculo.idPlaca === viagemSelecionada.idVeiculo)
+    : null;
+
   return (
     <div style={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <Sidebar 
@@ -322,9 +329,44 @@ export default function Dashboard() {
                 <div className="details-container">
                   <div className="detail-section">
                     <h4 className="sub-title">Itinerário</h4>
-                    <p><strong>Origem:</strong> {viagemSelecionada.localDeOrigem?.rua}, {viagemSelecionada.localDeOrigem?.numero}</p>
-                    <p><strong>Destino:</strong> {viagemSelecionada.localDeDestino?.rua}, {viagemSelecionada.localDeDestino?.numero}</p>
+                    <p><strong>Origem:</strong> {viagemSelecionada.localDeOrigem?.rua}, {viagemSelecionada.localDeOrigem?.numero} — {viagemSelecionada.localDeOrigem?.bairro}, {viagemSelecionada.localDeOrigem?.cidade}/{viagemSelecionada.localDeOrigem?.uf}</p>
+                    <p><strong>Destino:</strong> {viagemSelecionada.localDeDestino?.rua}, {viagemSelecionada.localDeDestino?.numero} — {viagemSelecionada.localDeDestino?.bairro}, {viagemSelecionada.localDeDestino?.cidade}/{viagemSelecionada.localDeDestino?.uf}</p>
                   </div>
+                  <div className="detail-section">
+                    <h4 className="sub-title">Logística</h4>
+                    <div className="logistics-grid">
+                      <div className="logistics-item">
+                        <span className="logistics-label">Motorista</span>
+                        <strong>{motoristaDaViagem ? `${motoristaDaViagem.nome} ${motoristaDaViagem.sobrenome}` : 'Não informado'}</strong>
+                      </div>
+                      <div className="logistics-item">
+                        <span className="logistics-label">CPF</span>
+                        <span>{motoristaDaViagem?.cpf || 'Não informado'}</span>
+                      </div>
+                      <div className="logistics-item">
+                        <span className="logistics-label">RG</span>
+                        <span>{motoristaDaViagem?.rg || 'Não informado'}</span>
+                      </div>
+                      <div className="logistics-item">
+                        <span className="logistics-label">Veículo</span>
+                        <strong>{veiculoDaViagem ? `${veiculoDaViagem.marca} ${veiculoDaViagem.modelo}` : 'Detalhes indisponíveis'}</strong>
+                      </div>
+                      <div className="logistics-item">
+                        <span className="logistics-label">Placa</span>
+                        <span>{viagemSelecionada.idVeiculo || 'Não informado'}</span>
+                      </div>
+                      <div className="logistics-item">
+                        <span className="logistics-label">Ano e cor</span>
+                        <span>{veiculoDaViagem ? `${veiculoDaViagem.ano} · ${veiculoDaViagem.cor}` : 'Não informado'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  {viagemSelecionada.idEvento?.nome && (
+                    <div className="detail-section">
+                      <h4 className="sub-title">Evento</h4>
+                      <p>{viagemSelecionada.idEvento.nome}</p>
+                    </div>
+                  )}
                 </div>
               )}
 
