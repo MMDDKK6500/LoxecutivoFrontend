@@ -109,13 +109,21 @@ export default function Dashboard() {
   // Funções de Gravação (Salvar Dados dos Modais)
   const handleSaveEvento = async (eventoPayload: Evento) => {
     try {
+      let response;
       if (eventoPayload.id) {
-        await apiCore.put(`/eventos/${eventoPayload.id}`, eventoPayload);
+        response = await apiCore.put<Evento>(`/eventos/${eventoPayload.id}`, eventoPayload);
       } else {
-        await apiCore.post('/eventos', eventoPayload);
+        response = await apiCore.post<Evento>('/eventos', eventoPayload);
       }
-      carregarEventos();
-      handleNewEvento();
+      const eventoSalvo = response.data;
+      const eventosAtualizados = await apiCore.get<Evento[]>('/eventos');
+      setEventos(eventosAtualizados.data);
+      if (eventoSalvo.id) {
+        setEventoSelecionado(eventoSalvo);
+        setViagemSelecionada(null);
+        setPassageirosDaViagem([]);
+        await carregarViagensDoEvento(eventoSalvo.id);
+      }
     } catch (error) {
       alert(apiErrorMessage(error, "Erro ao guardar o evento. Verifique os dados."));
     }

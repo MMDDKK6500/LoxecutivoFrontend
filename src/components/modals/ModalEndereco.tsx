@@ -41,7 +41,18 @@ export default function ModalEndereco({ isOpen, onClose, onSave }: ModalEndereco
             </div>
             <div className="form-group half-width">
               <label htmlFor="endereco-uf">UF:</label>
-              <input id="endereco-uf" value={uf} onChange={(e) => setUf(e.target.value.replace(/[^a-zA-Z]/g, '').slice(0, 2))} pattern="[A-Za-z]{2}" maxLength={2} title="Informe a UF com duas letras." required />
+              <select id="endereco-uf" value={uf} onChange={(e) => setUf(e.target.value)} className="form-control" required>
+                <option value="">Selecione...</option>
+                <option value="AC">Acre</option><option value="AL">Alagoas</option><option value="AP">Amapá</option>
+                <option value="AM">Amazonas</option><option value="BA">Bahia</option><option value="CE">Ceará</option>
+                <option value="DF">Distrito Federal</option><option value="ES">Espírito Santo</option><option value="GO">Goiás</option>
+                <option value="MA">Maranhão</option><option value="MT">Mato Grosso</option><option value="MS">Mato Grosso do Sul</option>
+                <option value="MG">Minas Gerais</option><option value="PA">Pará</option><option value="PB">Paraíba</option>
+                <option value="PR">Paraná</option><option value="PE">Pernambuco</option><option value="PI">Piauí</option>
+                <option value="RJ">Rio de Janeiro</option><option value="RN">Rio Grande do Norte</option><option value="RS">Rio Grande do Sul</option>
+                <option value="RO">Rondônia</option><option value="RR">Roraima</option><option value="SC">Santa Catarina</option>
+                <option value="SP">São Paulo</option><option value="SE">Sergipe</option><option value="TO">Tocantins</option>
+              </select>
             </div>
           </div>
           <div className="form-row">
