@@ -49,7 +49,7 @@ export default function ModalPassageiro({ isOpen, onClose, onSave, viagemAtual, 
           </div>
           <div className="form-row">
             <div className="form-group half-width">
-              <label>Contacto (Telemóvel):</label>
+              <label>Contato (Telefone):</label>
               <input type="text" value={numero} onChange={(e) => setNumero(e.target.value.replace(/\D/g, ''))} maxLength={14} pattern="[0-9]{1,14}" required />
             </div>
             <div className="form-group half-width">
