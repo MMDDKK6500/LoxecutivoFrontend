@@ -362,7 +362,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 0;
+  padding: 8px 6px 8px 0;
 }
 
 .item-link {
@@ -381,6 +381,12 @@ body {
 .logistics-actions {
   display: flex;
   gap: 10px;
+}
+
+.logistics-add-section {
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid #f0f2f5;
 }
 
 .item-list li:hover .item-actions {

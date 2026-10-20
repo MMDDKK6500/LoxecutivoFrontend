@@ -407,8 +407,8 @@ export default function Dashboard() {
                       <div className="item-actions">
                         <button
                           onClick={(e) => handleDeleteViagem(e, viagem.id!)}
-                          className="btn-danger-outline"
-                          style={{ padding: '2px 8px', fontSize: '0.8rem', borderRadius: '4px', cursor: 'pointer' }}
+                          className="icon-btn btn-danger-outline"
+                          aria-label="Excluir viagem"
                           title="Excluir Viagem"
                         >
                           <FiTrash2 />
@@ -513,7 +513,9 @@ export default function Dashboard() {
               )}
 
               {/* Botões sempre na base do cartão, empurrados para o fundo via marginTop: 'auto' */}
-              <div className="logistics-actions" style={{ marginTop: 'auto', paddingTop: '15px', borderTop: '1px solid #f0f2f5' }}>
+              <div className="logistics-add-section">
+                <h4 className="sub-title">Adicionar</h4>
+                <div className="logistics-actions">
                 <button 
                   className="btn-sm btn-add" 
                   style={{ flex: 1, padding: '8px' }} 
@@ -535,6 +537,7 @@ export default function Dashboard() {
                 >
                   <FiMapPin /> Endereço
                 </button>
+                </div>
               </div>
 
             </div>
