@@ -106,7 +106,9 @@ body {
   padding: 10px;
   border: none;
   border-radius: 6px;
-  font-weight: 600;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
   text-align: center;
   cursor: pointer;
   text-decoration: none;
@@ -116,14 +118,13 @@ body {
 .btn-save {
   background-color: #27ae60;
   color: white;
-  font-size: medium;
 }
 
 .btn-save:hover {
   background-color: #219653;
 }
 
-.btn-cancel { background-color: #e2e8f0; color: #4a5568; }
+.btn-cancel { background-color: #e2e8f0; color: #4a5568; font-size: 0.95rem; font-weight: 700; }
 .btn-cancel:hover { background-color: #cbd5e0; }
 
 .divider {
@@ -280,8 +281,8 @@ body {
   padding: 5px 10px;
   border-radius: 10px;
   border: none;
-  font-size: 0.8rem;
-  font-weight: bold;
+  font-size: 0.85rem;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
   display: inline-block;
@@ -300,9 +301,11 @@ body {
   border-radius: 6px;
   cursor: pointer;
   color: white;
+  font-weight: 700;
 }
 
-.icon-btn svg, .btn svg { width: 16px; height: 16px; }
+.icon-btn svg, .btn svg { width: 16px; height: 16px; stroke-width: 2.75; }
+.close-btn svg { stroke-width: 2.5; }
 .icon-btn:focus-visible, .btn:focus-visible { outline: 3px solid rgba(52, 152, 219, 0.35); outline-offset: 2px; }
 
 .btn-new {
@@ -330,6 +333,7 @@ body {
 .btn-danger:hover { background-color: #c0392b; }
 
 .btn-danger-outline { border: 1px solid #e74c3c; color: #e74c3c; background: transparent; }
+.icon-btn.btn-danger-outline { color: #e74c3c; }
 .btn-danger-outline:hover { background-color: #e74c3c; color: white; }
 
 .item-list li {
