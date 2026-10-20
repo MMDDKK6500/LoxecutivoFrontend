@@ -3,7 +3,7 @@ import axios from 'axios';
 export const apiExport = axios.create({
   baseURL: '/export',
   headers: {
-    Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    Accept: 'application/octet-stream',
   },
 });
 

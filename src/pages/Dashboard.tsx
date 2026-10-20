@@ -12,7 +12,7 @@ import ModalPassageiro from '../components/modals/ModalPassageiro';
 import ModalVeiculo from '../components/modals/ModalVeiculo';
 import ModalMotorista from '../components/modals/ModalMotorista';
 import ModalEndereco from '../components/modals/ModalEndereco';
-import { FiDownload, FiEdit2, FiPlus, FiTrash2, FiUserPlus, FiTruck, FiMapPin } from 'react-icons/fi';
+import { FiDownload, FiEdit2, FiFileText, FiPlus, FiTrash2, FiUserPlus, FiTruck, FiMapPin } from 'react-icons/fi';
 
 export default function Dashboard() {
   const apiErrorMessage = (error: unknown, fallback: string) => {
@@ -32,7 +32,7 @@ export default function Dashboard() {
   const [viagemEmEdicao, setViagemEmEdicao] = useState<Viagens | null>(null);
   const [passageirosDaViagem, setPassageirosDaViagem] = useState<Passageiro[]>([]);
   const [passageirosReload, setPassageirosReload] = useState(0);
-  const [exportandoEvento, setExportandoEvento] = useState(false);
+  const [exportandoEvento, setExportandoEvento] = useState<'excel' | 'pdf' | null>(null);
   
   const [termoPesquisa, setTermoPesquisa] = useState('');
 
@@ -239,19 +239,20 @@ export default function Dashboard() {
     }
   };
 
-  const handleExportarEvento = async () => {
+  const handleExportarEvento = async (format: 'excel' | 'pdf') => {
     if (!eventoSelecionado?.id) return;
 
-    setExportandoEvento(true);
+    setExportandoEvento(format);
     try {
-      const response = await apiExport.get(`/eventos/${eventoSelecionado.id}/excel`, {
+      const response = await apiExport.get(`/eventos/${eventoSelecionado.id}/${format}`, {
         responseType: 'blob',
       });
       const contentDisposition = response.headers['content-disposition'];
       const fileNameMatch = typeof contentDisposition === 'string'
         ? contentDisposition.match(/filename="?([^";]+)"?/i)
         : null;
-      const fileName = fileNameMatch?.[1] || `evento-${eventoSelecionado.id}.xlsx`;
+      const extension = format === 'excel' ? 'xlsx' : 'pdf';
+      const fileName = fileNameMatch?.[1] || `evento-${eventoSelecionado.id}.${extension}`;
       const fileUrl = URL.createObjectURL(response.data);
       const link = document.createElement('a');
       link.href = fileUrl;
@@ -261,7 +262,8 @@ export default function Dashboard() {
       link.remove();
       URL.revokeObjectURL(fileUrl);
     } catch (error) {
-      let message = apiErrorMessage(error, 'Erro ao exportar o evento para Excel.');
+      const formatName = format === 'excel' ? 'Excel' : 'PDF';
+      let message = apiErrorMessage(error, `Erro ao exportar o evento para ${formatName}.`);
       if (axios.isAxiosError(error) && error.response?.data instanceof Blob) {
         try {
           const body = JSON.parse(await error.response.data.text()) as { message?: string };
@@ -272,7 +274,7 @@ export default function Dashboard() {
       }
       alert(message);
     } finally {
-      setExportandoEvento(false);
+      setExportandoEvento(null);
     }
   };
 
@@ -361,11 +363,20 @@ export default function Dashboard() {
                     <button
                       className="icon-btn btn-add"
                       aria-label="Exportar evento para Excel"
-                      title={exportandoEvento ? 'Gerando Excel...' : 'Exportar evento para Excel'}
-                      onClick={() => void handleExportarEvento()}
-                      disabled={exportandoEvento}
+                      title={exportandoEvento === 'excel' ? 'Gerando Excel...' : 'Exportar evento para Excel'}
+                      onClick={() => void handleExportarEvento('excel')}
+                      disabled={exportandoEvento !== null}
                     >
                       <FiDownload />
+                    </button>
+                    <button
+                      className="icon-btn btn-add"
+                      aria-label="Exportar evento para PDF"
+                      title={exportandoEvento === 'pdf' ? 'Gerando PDF...' : 'Exportar evento para PDF'}
+                      onClick={() => void handleExportarEvento('pdf')}
+                      disabled={exportandoEvento !== null}
+                    >
+                      <FiFileText />
                     </button>
                     <button className="icon-btn btn-add" aria-label="Adicionar viagem" title="Adicionar viagem" onClick={() => { setViagemEmEdicao(null); setIsViagemModalOpen(true); }}><FiPlus /></button>
                   </div>
