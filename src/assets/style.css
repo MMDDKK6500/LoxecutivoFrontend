@@ -9,23 +9,22 @@
 body {
   display: flex;
   height: 100vh;
-  overflow: hidden; /* Impede o body de criar scroll duplo, permitindo gerir o scroll nos filhos se necessário ou na página toda */
-  background-color: #f4f6f9;
   margin: 0;
-  box-sizing: border-box;
+  overflow: hidden;
+  background-color: #f4f6f9;
 }
 
 
 .sidebar {
   width: 20vw;
+  height: 100vh;
   background-color: #ffffff;
   border-right: 1px solid #e0e4e8;
   padding: 25px 20px;
   display: flex;
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-  height: 100vh;
-  overflow-y: auto; /* Mantém o scroll interno apenas se a sidebar for maior que a tela */
+  overflow-y: auto; /* Só mostra scrollbar se o conteúdo exceder a altura */
   box-sizing: border-box;
 }
 
@@ -162,8 +161,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow-y: auto; /* Faz com que toda a área direita (Navbar + Conteúdo) role junta numa única barra de scroll da janela */
-  box-sizing: border-box;
+  overflow: hidden; /* Evita que a área principal transborde */
 }
 
 .navbar {
@@ -184,19 +182,20 @@ body {
 }
 
 .content {
-  padding: 40px;
-  color: #2d3748;
   flex: 1;
+  padding: 30px;
+  color: #2d3748;
   display: flex;
   flex-direction: column;
+  min-height: 0; /* Essencial para permitir que os filhos respeitem o limite de altura */
 }
 
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 20px;
-  flex: 1; /* Faz a grid expandir para ocupar o espaço disponível */
-  min-height: 500px; /* Garencia altura mínima para os cartões */
+  flex: 1;
+  min-height: 0; /* Permite conter o tamanho das colunas */
 }
 
 .card {
@@ -206,7 +205,8 @@ body {
   box-shadow: 0 2px 5px rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
-  height: 100%; /* Faz os cartões preencherem a altura total da linha da grid */
+  height: 100%;
+  min-height: 0; /* Impede o cartão de esticar além da grid */
   box-sizing: border-box;
 }
 
@@ -641,6 +641,15 @@ section {
   font-weight: 600;
   border-left: 3px solid #3182ce;
   padding-left: 8px;
+}
+
+.item-list,
+.details-container {
+  list-style: none;
+  padding: 0;
+  flex: 1;
+  overflow-y: auto; /* Cria barra de rolagem interna APENAS se houver muitos passageiros/viagens */
+  min-height: 0;
 }
 
 @media (max-width: 900px) {
