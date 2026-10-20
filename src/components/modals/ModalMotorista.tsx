@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { Motorista } from '../../types';
 
 interface ModalMotoristaProps {
@@ -9,19 +9,10 @@ interface ModalMotoristaProps {
 }
 
 export default function ModalMotorista({ isOpen, onClose, onSave, motoristaEdit }: ModalMotoristaProps) {
-  const [nome, setNome] = useState('');
-  const [sobrenome, setSobrenome] = useState('');
-  const [rg, setRg] = useState('');
-  const [cpf, setCpf] = useState('');
-
-  useEffect(() => {
-    if (motoristaEdit) {
-      setNome(motoristaEdit.nome); setSobrenome(motoristaEdit.sobrenome);
-      setRg(motoristaEdit.rg); setCpf(motoristaEdit.cpf);
-    } else {
-      setNome(''); setSobrenome(''); setRg(''); setCpf('');
-    }
-  }, [motoristaEdit, isOpen]);
+  const [nome, setNome] = useState(motoristaEdit?.nome ?? '');
+  const [sobrenome, setSobrenome] = useState(motoristaEdit?.sobrenome ?? '');
+  const [rg, setRg] = useState(motoristaEdit?.rg ?? '');
+  const [cpf, setCpf] = useState(motoristaEdit?.cpf ?? '');
 
   if (!isOpen) return null;
 

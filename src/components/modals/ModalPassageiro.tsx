@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { Passageiro, Viagens } from '../../types';
 
 interface ModalPassageiroProps {
@@ -10,22 +10,12 @@ interface ModalPassageiroProps {
 }
 
 export default function ModalPassageiro({ isOpen, onClose, onSave, viagemAtual, passageiroEdit }: ModalPassageiroProps) {
-  const [nome, setNome] = useState('');
-  const [sobrenome, setSobrenome] = useState('');
-  const [numero, setNumero] = useState('');
-  const [empresa, setEmpresa] = useState('');
-  const [rg, setRg] = useState('');
-  const [cpf, setCpf] = useState('');
-
-  useEffect(() => {
-    if (passageiroEdit) {
-      setNome(passageiroEdit.nome); setSobrenome(passageiroEdit.sobrenome);
-      setNumero(passageiroEdit.numero); setEmpresa(passageiroEdit.empresa);
-      setRg(passageiroEdit.rg); setCpf(passageiroEdit.cpf);
-    } else {
-      setNome(''); setSobrenome(''); setNumero(''); setEmpresa(''); setRg(''); setCpf('');
-    }
-  }, [passageiroEdit, isOpen]);
+  const [nome, setNome] = useState(passageiroEdit?.nome ?? '');
+  const [sobrenome, setSobrenome] = useState(passageiroEdit?.sobrenome ?? '');
+  const [numero, setNumero] = useState(passageiroEdit?.numero ?? '');
+  const [empresa, setEmpresa] = useState(passageiroEdit?.empresa ?? '');
+  const [rg, setRg] = useState(passageiroEdit?.rg ?? '');
+  const [cpf, setCpf] = useState(passageiroEdit?.cpf ?? '');
 
   if (!isOpen) return null;
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import type { Viagens, Evento, Endereco, Motorista, Veiculo } from '../../types';
 
 interface ModalViagemProps {
@@ -13,24 +13,10 @@ interface ModalViagemProps {
 }
 
 export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, enderecos, motoristas, veiculos, viagemEdit }: ModalViagemProps) {
-  const [idOrigem, setIdOrigem] = useState<number | ''>('');
-  const [idDestino, setIdDestino] = useState<number | ''>('');
-  const [idMotorista, setIdMotorista] = useState<number | ''>('');
-  const [idVeiculo, setIdVeiculo] = useState<string>('');
-
-  useEffect(() => {
-    if (viagemEdit) {
-      setIdOrigem(viagemEdit.localDeOrigem?.id ?? '');
-      setIdDestino(viagemEdit.localDeDestino?.id ?? '');
-      setIdMotorista(viagemEdit.idMotorista?.id ?? '');
-      setIdVeiculo(viagemEdit.idVeiculo ?? '');
-    } else {
-      setIdOrigem('');
-      setIdDestino('');
-      setIdMotorista('');
-      setIdVeiculo('');
-    }
-  }, [viagemEdit, isOpen]);
+  const [idOrigem, setIdOrigem] = useState<number | ''>(viagemEdit?.localDeOrigem?.id ?? '');
+  const [idDestino, setIdDestino] = useState<number | ''>(viagemEdit?.localDeDestino?.id ?? '');
+  const [idMotorista, setIdMotorista] = useState<number | ''>(viagemEdit?.idMotorista?.id ?? '');
+  const [idVeiculo, setIdVeiculo] = useState(viagemEdit?.idVeiculo ?? '');
 
   if (!isOpen) return null;
 

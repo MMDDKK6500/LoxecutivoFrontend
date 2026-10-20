@@ -1,11 +1,24 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import { useState } from 'react';
 import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
 
 // Componente para verificar se o token JWT existe no localStorage
 function PrivateRoute({ children }: { children: React.ReactNode }) {
+  const [now] = useState(() => Date.now());
   const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/login" replace />;
+  if (!token) return <Navigate to="/login" replace />;
+
+  try {
+    const { exp } = jwtDecode<{ exp?: number }>(token);
+    if (exp && exp * 1000 > now) return children;
+  } catch {
+    // Malformed tokens are removed before showing the protected screen.
+  }
+
+  localStorage.removeItem('token');
+  return <Navigate to="/login" replace />;
 }
 
 export default function AppRoutes() {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import type { Veiculo } from '../../types';
 
 interface ModalVeiculoProps {
@@ -9,23 +9,11 @@ interface ModalVeiculoProps {
 }
 
 export default function ModalVeiculo({ isOpen, onClose, onSave, veiculoEdit }: ModalVeiculoProps) {
-  const [idPlaca, setIdPlaca] = useState('');
-  const [modelo, setModelo] = useState('');
-  const [ano, setAno] = useState<number | ''>('');
-  const [marca, setMarca] = useState('');
-  const [cor, setCor] = useState('');
-
-  useEffect(() => {
-    if (veiculoEdit) {
-      setIdPlaca(veiculoEdit.idPlaca);
-      setModelo(veiculoEdit.modelo);
-      setAno(veiculoEdit.ano);
-      setMarca(veiculoEdit.marca);
-      setCor(veiculoEdit.cor);
-    } else {
-      setIdPlaca(''); setModelo(''); setAno(''); setMarca(''); setCor('');
-    }
-  }, [veiculoEdit, isOpen]);
+  const [idPlaca, setIdPlaca] = useState(veiculoEdit?.idPlaca ?? '');
+  const [modelo, setModelo] = useState(veiculoEdit?.modelo ?? '');
+  const [ano, setAno] = useState<number | ''>(veiculoEdit?.ano ?? '');
+  const [marca, setMarca] = useState(veiculoEdit?.marca ?? '');
+  const [cor, setCor] = useState(veiculoEdit?.cor ?? '');
 
   if (!isOpen) return null;
 

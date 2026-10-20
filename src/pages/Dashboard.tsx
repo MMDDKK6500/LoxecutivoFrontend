@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { apiCore } from '../services/apiCore';
 import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
@@ -19,6 +19,7 @@ export default function Dashboard() {
   const [viagemSelecionada, setViagemSelecionada] = useState<Viagens | null>(null);
   const [viagemEmEdicao, setViagemEmEdicao] = useState<Viagens | null>(null);
   const [passageirosDaViagem, setPassageirosDaViagem] = useState<Passageiro[]>([]);
+  const [passageirosReload, setPassageirosReload] = useState(0);
   
   const [termoPesquisa, setTermoPesquisa] = useState('');
 
@@ -32,6 +33,7 @@ export default function Dashboard() {
   const [enderecos, setEnderecos] = useState<Endereco[]>([]);
   const [motoristas, setMotoristas] = useState<Motorista[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
+  const viagensRequestId = useRef(0);
 
   // Carregamentos de Dados da API
   const carregarEventos = () => {
@@ -46,6 +48,25 @@ export default function Dashboard() {
     apiCore.get<Veiculo[]>('/veiculos').then(res => setVeiculos(res.data)).catch(() => {});
   };
 
+  const carregarViagensDoEvento = async (eventoId: number) => {
+    const requestId = ++viagensRequestId.current;
+    try {
+      const response = await apiCore.get<Viagens[]>(`/viagens/evento/${eventoId}`);
+      const isCurrent = requestId === viagensRequestId.current;
+      if (isCurrent) {
+        setViagensDoEvento(response.data);
+      }
+      return { viagens: response.data, isCurrent };
+    } catch (error) {
+      const isCurrent = requestId === viagensRequestId.current;
+      if (isCurrent) {
+        console.error('Erro ao carregar viagens do evento:', error);
+        setViagensDoEvento([]);
+      }
+      return { viagens: [], isCurrent };
+    }
+  };
+
   useEffect(() => {
     carregarEventos();
     carregarRecursosGlobais();
@@ -53,13 +74,16 @@ export default function Dashboard() {
 
   // Quando seleciona uma viagem, tenta buscar os passageiros dela
   useEffect(() => {
-    if (viagemSelecionada?.id) {
-      apiCore.get<Passageiro[]>(`/passageiros/viagem/${viagemSelecionada.id}`)
-        .then(res => setPassageirosDaViagem(res.data))
-        .catch(() => setPassageirosDaViagem([])); // Fallback em caso de erro
-    }
-    // O bloco 'else' foi removido para evitar avisos de renders em cascata (set-state-in-effect)
-  }, [viagemSelecionada]);
+    const viagemId = viagemSelecionada?.id;
+    if (!viagemId) return;
+
+    let isCurrent = true;
+    apiCore.get<Passageiro[]>(`/passageiros/viagem/${viagemId}`)
+      .then(res => { if (isCurrent) setPassageirosDaViagem(res.data); })
+      .catch(() => { if (isCurrent) setPassageirosDaViagem([]); });
+
+    return () => { isCurrent = false; };
+  }, [viagemSelecionada?.id, passageirosReload]);
 
   const selecionarEvento = (eventoId: number) => {
     const eventoEncontrado = eventos.find(ev => ev.id === eventoId) || null;
@@ -67,12 +91,7 @@ export default function Dashboard() {
     setViagemSelecionada(null);
     setPassageirosDaViagem([]);
     
-    apiCore.get<Viagens[]>(`/viagens/evento/${eventoId}`)
-      .then(response => setViagensDoEvento(response.data))
-      .catch(error => {
-        console.error("Erro ao carregar viagens do evento:", error);
-        setViagensDoEvento([]);
-      });
+    void carregarViagensDoEvento(eventoId);
   };
 
   // Funções de Gravação (Salvar Dados dos Modais)
@@ -99,7 +118,11 @@ export default function Dashboard() {
       }
       setIsViagemModalOpen(false);
       setViagemEmEdicao(null);
-      if (eventoSelecionado) selecionarEvento(eventoSelecionado.id!); // Recarrega lista
+      if (eventoSelecionado) {
+        const result = await carregarViagensDoEvento(eventoSelecionado.id!);
+        const viagemAtualizada = result.viagens.find(item => item.id === viagemPayload.id);
+        if (result.isCurrent && viagemAtualizada) setViagemSelecionada(viagemAtualizada);
+      }
     } catch {
       alert("Erro ao salvar viagem.");
     }
@@ -109,8 +132,7 @@ export default function Dashboard() {
     try {
       await apiCore.post('/passageiros', passageiroPayload);
       setIsPassageiroModalOpen(false);
-      // Força a atualização da viagem selecionada para recarregar passageiros
-      setViagemSelecionada({ ...viagemSelecionada } as Viagens);
+      setPassageirosReload((current) => current + 1);
     } catch {
       alert("Erro ao salvar passageiro.");
     }
@@ -147,6 +169,7 @@ export default function Dashboard() {
   };
 
   const handleNewEvento = () => {
+    viagensRequestId.current += 1;
     setEventoSelecionado(null);
     setViagensDoEvento([]);
     setViagemSelecionada(null);
@@ -161,10 +184,7 @@ export default function Dashboard() {
     }
 
     try {
-      // Nota: Use a rota correspondente ao seu Java. 
-      // Se converteu para REST, será .delete(`/viagens/${id}`). 
-      // Se manteve o padrão antigo do Controller Thymeleaf, será .get(`/viagens/deletar/${id}`)
-      await apiCore.get(`/viagens/deletar/${id}`); 
+      await apiCore.delete(`/viagens/${id}`);
       
       // Recarrega a lista de viagens do evento atual
       if (eventoSelecionado) {
@@ -228,7 +248,10 @@ export default function Dashboard() {
                   {viagensDoEvento.map((viagem) => (
                     <li 
                       key={viagem.id} 
-                      onClick={() => setViagemSelecionada(viagem)}
+                      onClick={() => {
+                        setPassageirosDaViagem([]);
+                        setViagemSelecionada(viagem);
+                      }}
                       className={viagemSelecionada?.id === viagem.id ? 'active' : ''}
                       style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                     >
@@ -329,7 +352,7 @@ export default function Dashboard() {
       </div>
 
       {/* Renderização Condicional dos Modais */}
-      {eventoSelecionado && (
+      {eventoSelecionado && isViagemModalOpen && (
         <ModalViagem 
           isOpen={isViagemModalOpen} 
           onClose={() => { setIsViagemModalOpen(false); setViagemEmEdicao(null); }}
@@ -342,7 +365,7 @@ export default function Dashboard() {
         />
       )}
 
-      {viagemSelecionada && (
+      {viagemSelecionada && isPassageiroModalOpen && (
         <ModalPassageiro 
           isOpen={isPassageiroModalOpen} 
           onClose={() => setIsPassageiroModalOpen(false)} 
@@ -351,17 +374,17 @@ export default function Dashboard() {
         />
       )}
 
-      <ModalVeiculo 
+      {isVeiculoModalOpen && <ModalVeiculo 
         isOpen={isVeiculoModalOpen} 
         onClose={() => setIsVeiculoModalOpen(false)} 
         onSave={handleSaveVeiculo} 
-      />
+      />}
 
-      <ModalMotorista 
+      {isMotoristaModalOpen && <ModalMotorista 
         isOpen={isMotoristaModalOpen} 
         onClose={() => setIsMotoristaModalOpen(false)} 
         onSave={handleSaveMotorista} 
-      />
+      />}
 
     </div>
   );

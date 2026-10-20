@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { apiAuth } from '../services/apiAuth';
 
@@ -17,9 +18,14 @@ export default function Login() {
       if (response.data.auth && response.data.token) {
         localStorage.setItem('token', response.data.token);
         navigate('/'); // Redireciona para o Dashboard protegido
+      } else {
+        setErro(response.data.message || 'Não foi possível autenticar. Verifique as suas credenciais.');
       }
-    } catch (err: any) {
-      setErro(err.response?.data?.message || 'Erro ao realizar login. Verifique as suas credenciais.');
+    } catch (error: unknown) {
+      const message = axios.isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message
+        : undefined;
+      setErro(message || 'Erro ao realizar login. Verifique as suas credenciais.');
     }
   };
 
