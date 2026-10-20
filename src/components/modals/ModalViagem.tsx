@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { Viagens, Evento, Endereco, Motorista, Veiculo } from '../../types';
 
 interface ModalViagemProps {
@@ -9,13 +9,28 @@ interface ModalViagemProps {
   enderecos: Endereco[];
   motoristas: Motorista[];
   veiculos: Veiculo[];
+  viagemEdit?: Viagens | null;
 }
 
-export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, enderecos, motoristas, veiculos }: ModalViagemProps) {
+export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, enderecos, motoristas, veiculos, viagemEdit }: ModalViagemProps) {
   const [idOrigem, setIdOrigem] = useState<number | ''>('');
   const [idDestino, setIdDestino] = useState<number | ''>('');
   const [idMotorista, setIdMotorista] = useState<number | ''>('');
   const [idVeiculo, setIdVeiculo] = useState<string>('');
+
+  useEffect(() => {
+    if (viagemEdit) {
+      setIdOrigem(viagemEdit.localDeOrigem?.id ?? '');
+      setIdDestino(viagemEdit.localDeDestino?.id ?? '');
+      setIdMotorista(viagemEdit.idMotorista?.id ?? '');
+      setIdVeiculo(viagemEdit.idVeiculo ?? '');
+    } else {
+      setIdOrigem('');
+      setIdDestino('');
+      setIdMotorista('');
+      setIdVeiculo('');
+    }
+  }, [viagemEdit, isOpen]);
 
   if (!isOpen) return null;
 
@@ -29,6 +44,7 @@ export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, ende
 
     if (localDeOrigem && localDeDestino && motorista && idVeiculo) {
       onSave({
+        id: viagemEdit?.id,
         localDeOrigem,
         localDeDestino,
         idMotorista: motorista,
@@ -42,7 +58,7 @@ export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, ende
     <div className="modal-overlay active">
       <div className="modal-content modal-large">
         <div className="modal-header">
-          <h2>Nova Rota / Viagem</h2>
+          <h2>{viagemEdit ? 'Editar Transporte e Rota' : 'Nova Rota / Viagem'}</h2>
           <button type="button" className="close-btn" onClick={onClose}>&times;</button>
         </div>
         <form onSubmit={handleSubmit}>
@@ -93,7 +109,7 @@ export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, ende
 
           <div className="form-actions" style={{ marginTop: '30px' }}>
             <button type="button" className="btn btn-cancel" onClick={onClose}>Cancelar</button>
-            <button type="submit" className="btn btn-save">Salvar Viagem</button>
+            <button type="submit" className="btn btn-save">{viagemEdit ? 'Salvar Alterações' : 'Salvar Viagem'}</button>
           </div>
         </form>
       </div>

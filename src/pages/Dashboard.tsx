@@ -17,6 +17,7 @@ export default function Dashboard() {
   
   const [viagensDoEvento, setViagensDoEvento] = useState<Viagens[]>([]);
   const [viagemSelecionada, setViagemSelecionada] = useState<Viagens | null>(null);
+  const [viagemEmEdicao, setViagemEmEdicao] = useState<Viagens | null>(null);
   const [passageirosDaViagem, setPassageirosDaViagem] = useState<Passageiro[]>([]);
   
   const [termoPesquisa, setTermoPesquisa] = useState('');
@@ -91,8 +92,13 @@ export default function Dashboard() {
 
   const handleSaveViagem = async (viagemPayload: Viagens) => {
     try {
-      await apiCore.post('/viagens', viagemPayload);
+      if (viagemPayload.id) {
+        await apiCore.put(`/viagens/${viagemPayload.id}`, viagemPayload);
+      } else {
+        await apiCore.post('/viagens', viagemPayload);
+      }
       setIsViagemModalOpen(false);
+      setViagemEmEdicao(null);
       if (eventoSelecionado) selecionarEvento(eventoSelecionado.id!); // Recarrega lista
     } catch {
       alert("Erro ao salvar viagem.");
@@ -204,21 +210,22 @@ export default function Dashboard() {
         <section className="content">
           <div className="dashboard-grid">
             
-{/* Card 1: Viagens do Evento */}
+            {/* Card 1: Viagens do Evento */}
             <div className="card">
               <div className="card-header">
                 <h3>Viagens do Evento</h3>
                 {eventoSelecionado && (
-                  <button className="btn-sm btn-add" onClick={() => setIsViagemModalOpen(true)}>+ Adicionar</button>
+                  <button className="btn-sm btn-add" onClick={() => { setViagemEmEdicao(null); setIsViagemModalOpen(true); }}>+ Adicionar</button>
                 )}
               </div>
-              <ul className="item-list">
-                {!eventoSelecionado ? (
-                  <li className="empty-msg">Selecione um evento salvo.</li>
-                ) : viagensDoEvento.length === 0 ? (
-                  <li className="empty-msg">Nenhuma viagem cadastrada.</li>
-                ) : (
-                  viagensDoEvento.map((viagem) => (
+              
+              {!eventoSelecionado ? (
+                <div className="placeholder"><p>Selecione um evento salvo.</p></div>
+              ) : viagensDoEvento.length === 0 ? (
+                <div className="placeholder"><p>Nenhuma viagem cadastrada.</p></div>
+              ) : (
+                <ul className="item-list">
+                  {viagensDoEvento.map((viagem) => (
                     <li 
                       key={viagem.id} 
                       onClick={() => setViagemSelecionada(viagem)}
@@ -229,7 +236,6 @@ export default function Dashboard() {
                         Veículo: <strong>{viagem.idVeiculo}</strong>
                       </span>
                       
-                      {/* O botão de excluir aparece aqui e aproveita o seu CSS existente */}
                       <div className="item-actions">
                         <button
                           onClick={(e) => handleDeleteViagem(e, viagem.id!)}
@@ -241,9 +247,9 @@ export default function Dashboard() {
                         </button>
                       </div>
                     </li>
-                  ))
-                )}
-              </ul>
+                  ))}
+                </ul>
+              )}
             </div>
 
             {/* Card 2: Passageiros */}
@@ -254,19 +260,18 @@ export default function Dashboard() {
                   <button className="btn-sm btn-add" onClick={() => setIsPassageiroModalOpen(true)}>+ Adicionar</button>
                 )}
               </div>
+              
               {!viagemSelecionada ? (
-                <div className="placeholder"><p>Selecione uma viagem ao lado</p></div>
+                <div className="placeholder"><p>Selecione uma viagem ao lado.</p></div>
+              ) : passageirosDaViagem.length === 0 ? (
+                <div className="placeholder"><p>Sem passageiros escalados.</p></div>
               ) : (
                 <ul className="item-list">
-                  {passageirosDaViagem.length === 0 ? (
-                    <li className="empty-msg">Sem passageiros escalados.</li>
-                  ) : (
-                    passageirosDaViagem.map((passageiro) => (
-                      <li key={passageiro.id}>
-                        <strong>{passageiro.nome} {passageiro.sobrenome}</strong>
-                      </li>
-                    ))
-                  )}
+                  {passageirosDaViagem.map((passageiro) => (
+                    <li key={passageiro.id}>
+                      <strong>{passageiro.nome} {passageiro.sobrenome}</strong>
+                    </li>
+                  ))}
                 </ul>
               )}
             </div>
@@ -275,6 +280,17 @@ export default function Dashboard() {
             <div className="card">
               <div className="card-header">
                 <h3>Transporte e Rota</h3>
+                {viagemSelecionada && (
+                  <button
+                    className="btn-sm btn-add"
+                    onClick={() => {
+                      setViagemEmEdicao(viagemSelecionada);
+                      setIsViagemModalOpen(true);
+                    }}
+                  >
+                    Editar
+                  </button>
+                )}
               </div>
               
               {!viagemSelecionada ? (
@@ -316,12 +332,13 @@ export default function Dashboard() {
       {eventoSelecionado && (
         <ModalViagem 
           isOpen={isViagemModalOpen} 
-          onClose={() => setIsViagemModalOpen(false)} 
+          onClose={() => { setIsViagemModalOpen(false); setViagemEmEdicao(null); }}
           onSave={handleSaveViagem} 
           eventoAtual={eventoSelecionado}
           enderecos={enderecos}
           motoristas={motoristas}
           veiculos={veiculos}
+          viagemEdit={viagemEmEdicao}
         />
       )}
 
