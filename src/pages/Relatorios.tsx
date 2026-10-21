@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { useToast } from '../contexts/useToast';
 import { apiExport } from '../services/apiExport';
-import type { CompanyReport } from '../types/report';
+import type { CompanyReport, WeeklyReportMetadata } from '../types/report';
 
 type ReportFormat = 'excel' | 'pdf';
 
@@ -43,6 +43,10 @@ export default function Relatorios() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [exporting, setExporting] = useState<ReportFormat | null>(null);
+  const [weeklyReports, setWeeklyReports] = useState<WeeklyReportMetadata[]>([]);
+  const [weeklyLoading, setWeeklyLoading] = useState(true);
+  const [weeklyError, setWeeklyError] = useState('');
+  const [downloadingWeeklyId, setDownloadingWeeklyId] = useState<string | null>(null);
 
   const params = useMemo(() => ({ ...filters }), [filters]);
   const loadReport = useCallback(async () => {
@@ -60,6 +64,36 @@ export default function Relatorios() {
   }, [params]);
 
   useEffect(() => { void Promise.resolve().then(loadReport); }, [loadReport]);
+
+  const loadWeeklyReports = useCallback(async () => {
+    setWeeklyLoading(true);
+    setWeeklyError('');
+    try {
+      const response = await apiExport.get<WeeklyReportMetadata[]>('/relatorio-geral/semanais');
+      setWeeklyReports(response.data);
+    } catch (requestError) {
+      setWeeklyError(reportError(requestError, 'Não foi possível carregar os relatórios semanais.'));
+    } finally { setWeeklyLoading(false); }
+  }, []);
+
+  useEffect(() => { void Promise.resolve().then(loadWeeklyReports); }, [loadWeeklyReports]);
+
+  const downloadWeeklyReport = async (id: string) => {
+    setDownloadingWeeklyId(id);
+    try {
+      const response = await apiExport.get(`/relatorio-geral/semanais/${id}/pdf`, { responseType: 'blob' });
+      const fileUrl = URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = `relatorio-semanal-${id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(fileUrl);
+    } catch (downloadError) {
+      notify(reportError(downloadError, 'Não foi possível baixar o relatório semanal.'), 'error');
+    } finally { setDownloadingWeeklyId(null); }
+  };
 
   const applyFilters = (event: React.FormEvent) => {
     event.preventDefault();
@@ -130,6 +164,28 @@ export default function Relatorios() {
           <button className="btn-sm btn-add" type="submit" disabled={loading}><FiActivity aria-hidden="true" /> Aplicar</button>
           <button className="icon-btn btn-refresh report-refresh" type="button" aria-label="Atualizar relatório" title="Atualizar relatório" onClick={() => void loadReport()} disabled={loading}><FiRefreshCw aria-hidden="true" /></button>
         </form>
+
+        <section className="card report-weekly-card">
+          <div className="report-weekly-heading">
+            <div><h2>Relatórios semanais</h2><p>PDFs gerados automaticamente aos domingos.</p></div>
+            <button className="icon-btn btn-refresh report-refresh" type="button" aria-label="Atualizar relatórios semanais" title="Atualizar relatórios semanais" onClick={() => void loadWeeklyReports()} disabled={weeklyLoading}><FiRefreshCw aria-hidden="true" /></button>
+          </div>
+          {weeklyError && <div className="report-error" role="alert">{weeklyError}</div>}
+          {weeklyLoading ? <p className="report-weekly-empty">Carregando relatórios…</p>
+            : weeklyReports.length === 0 ? <p className="report-weekly-empty">Ainda não há relatórios semanais armazenados.</p>
+              : <div className="report-weekly-list">{weeklyReports.map((weekly) => (
+                <article className="report-weekly-row" key={weekly.id}>
+                  <span className="report-stat-icon"><FiFileText aria-hidden="true" /></span>
+                  <div className="report-weekly-info">
+                    <strong>Semana encerrada em {new Date(`${weekly.id}T00:00:00`).toLocaleDateString('pt-BR')}</strong>
+                    <span>Gerado em {new Date(weekly.generatedAt).toLocaleString('pt-BR')} · {weekly.summary.totalViagens} viagens · {weekly.summary.realizadas} realizadas</span>
+                  </div>
+                  <button className="btn-sm report-pdf-button" type="button" onClick={() => void downloadWeeklyReport(weekly.id)} disabled={downloadingWeeklyId !== null}>
+                    <FiDownload aria-hidden="true" /> {downloadingWeeklyId === weekly.id ? 'Baixando…' : 'Baixar PDF'}
+                  </button>
+                </article>
+              ))}</div>}
+        </section>
 
         {error && <div className="report-error" role="alert">{error}</div>}
         {loading ? <div className="card report-loading">Calculando indicadores…</div> : report && (

@@ -74,3 +74,10 @@ export interface CompanyReport {
   hours: CompanyHourUsage[];
   routes: CompanyRouteUsage[];
 }
+
+export interface WeeklyReportMetadata {
+  id: string;
+  generatedAt: string;
+  period: { from: string | null; to: string | null };
+  summary: CompanyReportSummary;
+}

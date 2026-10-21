@@ -1047,6 +1047,25 @@ section {
 .report-period-caption { color: #718096; font-size: 0.85rem; }
 .report-period-caption strong { color: #4a5568; }
 
+.report-weekly-card {
+  height: auto;
+  padding: 18px;
+}
+.report-weekly-heading,
+.report-weekly-row {
+  display: flex;
+  align-items: center;
+}
+.report-weekly-heading { justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.report-weekly-heading h2 { margin: 0 0 4px; color: #2c3e50; font-size: 1.05rem; }
+.report-weekly-heading p,
+.report-weekly-empty { margin: 0; color: #718096; font-size: 0.84rem; }
+.report-weekly-list { display: flex; flex-direction: column; }
+.report-weekly-row { gap: 12px; padding: 12px 2px; border-top: 1px solid #edf1f5; }
+.report-weekly-info { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: 4px; }
+.report-weekly-info strong { color: #2d3748; font-size: 0.9rem; }
+.report-weekly-info span { color: #718096; font-size: 0.78rem; }
+
 .report-stat-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1137,6 +1156,9 @@ section {
   .report-page-heading { align-items: flex-start; flex-direction: column; }
   .report-export-actions { width: 100%; }
   .report-export-actions button { flex: 1; }
+  .report-weekly-row { align-items: flex-start; flex-wrap: wrap; }
+  .report-weekly-info { flex-basis: calc(100% - 55px); }
+  .report-weekly-row > button { margin-left: 52px; }
   .report-filter-card { align-items: stretch; }
   .report-filter-card label { flex: 1; min-width: 42%; }
   .report-filter-card input { min-width: 0; width: 100%; }
