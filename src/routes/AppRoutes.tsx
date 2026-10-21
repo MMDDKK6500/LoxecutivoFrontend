@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
 import Cadastros from '../pages/Cadastros';
+import Relatorios from '../pages/Relatorios';
 import { ToastProvider } from '../contexts/ToastContext';
 import ServiceHealthMonitor from '../components/layout/ServiceHealthMonitor';
 
@@ -34,6 +35,7 @@ export default function AppRoutes() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/cadastros/:tipo" element={<PrivateRoute><Cadastros /></PrivateRoute>} />
+          <Route path="/relatorios" element={<PrivateRoute><Relatorios /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </ToastProvider>

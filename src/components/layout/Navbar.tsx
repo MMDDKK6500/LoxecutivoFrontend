@@ -20,6 +20,7 @@ export default function Navbar({ searchTerm, onSearchChange, onLogout }: NavbarP
         <NavLink to="/cadastros/motoristas" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Motoristas</NavLink>
         <NavLink to="/cadastros/veiculos" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Veículos</NavLink>
         <NavLink to="/cadastros/enderecos" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Endereços</NavLink>
+        <NavLink to="/relatorios" className={({ isActive }) => isActive ? 'navbar-link active' : 'navbar-link'}>Relatórios</NavLink>
       </div>
 
       <GlobalSearch value={searchTerm || ''} onChange={(term) => onSearchChange?.(term)} />
