@@ -37,7 +37,8 @@ export default function ModalViagem({ isOpen, onClose, onSave, eventoAtual, ende
         idMotorista: motorista,
         idVeiculo,
         idEvento: eventoAtual,
-        dataHora: `${dataHora}:00`
+        dataHora: `${dataHora}:00`,
+        status: viagemEdit?.status ?? 'AGENDADA',
       });
     }
   };

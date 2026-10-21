@@ -5,7 +5,7 @@ import { apiExport } from '../services/apiExport';
 import axios from 'axios';
 import Sidebar from '../components/layout/Sidebar';
 import Navbar from '../components/layout/Navbar';
-import type { Evento, Viagens, Passageiro, Endereco, Motorista, Veiculo } from '../types';
+import type { Evento, Viagens, ViagemStatus, Passageiro, Endereco, Motorista, Veiculo } from '../types';
 import { formatCpf, formatRg } from '../utils/masks';
 import { useToast } from '../contexts/useToast';
 
@@ -15,7 +15,7 @@ import ModalPassageiro from '../components/modals/ModalPassageiro';
 import ModalVeiculo from '../components/modals/ModalVeiculo';
 import ModalMotorista from '../components/modals/ModalMotorista';
 import ModalEndereco from '../components/modals/ModalEndereco';
-import { FiDownload, FiEdit2, FiFileText, FiPlus, FiTrash2, FiUserPlus, FiTruck, FiMapPin } from 'react-icons/fi';
+import { FiCheckCircle, FiDownload, FiEdit2, FiFileText, FiPlus, FiRotateCcw, FiTrash2, FiUserPlus, FiTruck, FiMapPin, FiXCircle } from 'react-icons/fi';
 
 export default function Dashboard() {
   const location = useLocation();
@@ -355,6 +355,28 @@ export default function Dashboard() {
     }
   };
 
+  const handleChangeViagemStatus = async (event: React.MouseEvent, viagem: Viagens, status: ViagemStatus) => {
+    event.stopPropagation();
+    const labels: Record<ViagemStatus, string> = {
+      AGENDADA: 'agendada', REALIZADA: 'realizada', CANCELADA: 'cancelada',
+    };
+    const confirmation = status === 'CANCELADA'
+      ? 'Tem certeza que deseja cancelar esta viagem?'
+      : status === 'REALIZADA'
+        ? 'Confirmar que esta viagem foi realizada?'
+        : 'Reabrir esta viagem como agendada?';
+    if (!viagem.id || !window.confirm(confirmation)) return;
+
+    try {
+      const { data: updatedTrip } = await apiCore.patch<Viagens>(`/viagens/${viagem.id}/status`, { status });
+      setViagensDoEvento((current) => current.map((item) => item.id === updatedTrip.id ? updatedTrip : item));
+      setViagemSelecionada((current) => current?.id === updatedTrip.id ? updatedTrip : current);
+      notify(`Viagem marcada como ${labels[status]} com sucesso!`);
+    } catch (error) {
+      notify(apiErrorMessage(error, 'Não foi possível alterar o status da viagem.'), 'error');
+    }
+  };
+
   const motoristaDaViagem = viagemSelecionada
     ? motoristas.find(motorista => motorista.id === viagemSelecionada.idMotorista?.id) ?? viagemSelecionada.idMotorista
     : null;
@@ -444,9 +466,21 @@ export default function Dashboard() {
                         <span className="trip-driver">{[viagem.idMotorista?.nome, viagem.idMotorista?.sobrenome].filter(Boolean).join(' ') || 'Motorista não informado'}</span>
                         <span className="trip-vehicle">Veículo: <strong>{viagem.idVeiculo}</strong></span>
                         <small className="trip-date">{formatarDataHora(viagem.dataHora)}</small>
+                        <small className={`trip-status trip-status-${(viagem.status ?? 'AGENDADA').toLowerCase()}`}>
+                          {viagem.status === 'REALIZADA' ? 'Realizada' : viagem.status === 'CANCELADA' ? 'Cancelada' : 'Agendada'}
+                        </small>
                       </span>
                       
                       <div className="item-actions">
+                        {(!viagem.status || viagem.status === 'AGENDADA') && (
+                          <>
+                            <button type="button" className="icon-btn trip-status-action trip-complete-action" aria-label="Marcar viagem como realizada" title="Marcar como realizada" onClick={(e) => void handleChangeViagemStatus(e, viagem, 'REALIZADA')}><FiCheckCircle /></button>
+                            <button type="button" className="icon-btn trip-status-action btn-danger-outline" aria-label="Cancelar viagem" title="Cancelar viagem" onClick={(e) => void handleChangeViagemStatus(e, viagem, 'CANCELADA')}><FiXCircle /></button>
+                          </>
+                        )}
+                        {viagem.status === 'CANCELADA' && (
+                          <button type="button" className="icon-btn trip-status-action btn-add" aria-label="Reagendar viagem" title="Reagendar viagem" onClick={(e) => void handleChangeViagemStatus(e, viagem, 'AGENDADA')}><FiRotateCcw /></button>
+                        )}
                         <button
                           onClick={(e) => handleDeleteViagem(e, viagem.id!)}
                           className="icon-btn btn-danger-outline"

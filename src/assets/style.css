@@ -639,6 +639,23 @@ body {
   color: #4a5568;
 }
 
+.trip-status {
+  display: inline-flex;
+  align-self: flex-start;
+  margin-top: 5px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.trip-status-agendada { color: #805b00; background: #fff2c6; }
+.trip-status-realizada { color: #17633a; background: #d8f3e3; }
+.trip-status-cancelada { color: #9b2c2c; background: #ffe0e0; }
+.trip-status-action { opacity: 1; }
+.trip-complete-action { background: #2f855a; color: #fff; }
+.trip-complete-action:hover { background: #276749; }
+
 .item-actions {
   display: flex;
   gap: 8px;

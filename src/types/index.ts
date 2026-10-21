@@ -29,6 +29,8 @@ export interface Veiculo {
   cor: string;
 }
 
+export type ViagemStatus = 'AGENDADA' | 'REALIZADA' | 'CANCELADA';
+
 export interface Viagens {
   id?: number;
   localDeOrigem: Endereco;
@@ -37,6 +39,7 @@ export interface Viagens {
   idVeiculo: string; // Guarda a placa do veículo selecionado
   idEvento?: Evento;
   dataHora?: string;
+  status: ViagemStatus;
 }
 
 export interface Passageiro {
