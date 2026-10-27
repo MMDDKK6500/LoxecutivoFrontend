@@ -455,6 +455,7 @@ export default function Dashboard() {
                     <li 
                       key={viagem.id} 
                       onClick={() => {
+                        if (viagemSelecionada?.id === viagem.id) return;
                         setPassageirosDaViagem([]);
                         setViagemSelecionada(viagem);
                       }}
