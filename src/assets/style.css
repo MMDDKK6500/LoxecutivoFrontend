@@ -960,6 +960,10 @@ section {
   overflow: auto;
 }
 
+.report-page > * {
+  flex-shrink: 0;
+}
+
 .report-page-heading,
 .report-export-actions,
 .report-filter-title {
