@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useToast } from '../../contexts/useToast';
+import { recoveredServicesMessage, unavailableServicesMessage } from '../../utils/serviceHealthMessages';
 
 interface MonitoredService {
   name: string;
@@ -10,12 +11,6 @@ interface MonitoredService {
 interface HealthResponse {
   services: MonitoredService[];
 }
-
-const SERVICE_LABELS: Record<string, string> = {
-  'loxecutivo-core': 'Core',
-  'loxecutivo-auth': 'Autenticação',
-  'loxecutivo-export': 'Exportação',
-};
 
 const POLL_INTERVAL_MS = 30_000;
 const REQUEST_TIMEOUT_MS = 5_000;
@@ -28,7 +23,9 @@ export default function ServiceHealthMonitor() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const onProtectedPage = location.pathname === '/dashboard' || location.pathname.startsWith('/cadastros/');
+    const onProtectedPage = location.pathname === '/dashboard'
+      || location.pathname.startsWith('/cadastros/')
+      || location.pathname === '/relatorios';
     if (!token || !onProtectedPage) return;
 
     let active = true;
@@ -53,7 +50,7 @@ export default function ServiceHealthMonitor() {
         if (!active) return;
 
         if (monitorUnavailable.current) {
-          notify('Conexão com o monitoramento restabelecida.', 'success');
+          notify('A verificação automática do sistema voltou ao normal.', 'success');
           monitorUnavailable.current = false;
         }
 
@@ -64,22 +61,20 @@ export default function ServiceHealthMonitor() {
 
         const newlyDown = [...downServices].filter((name) => !previous?.has(name));
         if (newlyDown.length > 0) {
-          const labels = newlyDown.map((name) => SERVICE_LABELS[name] ?? name).join(', ');
-          notify(`Sem conexão com: ${labels}.`, 'error');
+          notify(unavailableServicesMessage(newlyDown), 'error');
         }
 
         if (previous) {
           const recovered = [...previous].filter((name) => !downServices.has(name));
           if (recovered.length > 0) {
-            const labels = recovered.map((name) => SERVICE_LABELS[name] ?? name).join(', ');
-            notify(`Conexão restabelecida com: ${labels}.`, 'success');
+            notify(recoveredServicesMessage(recovered), 'success');
           }
         }
 
         previousDownServices.current = downServices;
       } catch {
         if (active && !monitorUnavailable.current) {
-          notify('Não foi possível consultar a saúde dos serviços.', 'error');
+          notify('Não conseguimos verificar o funcionamento do sistema agora. Você pode continuar usando normalmente; tentaremos novamente de forma automática.', 'error');
           monitorUnavailable.current = true;
         }
       } finally {
