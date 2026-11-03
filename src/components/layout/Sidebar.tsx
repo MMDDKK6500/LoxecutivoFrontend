@@ -194,9 +194,9 @@ export default function Sidebar({
 
       {eventoSelecionado?.id && (
         <div className="evento-actions">
-          <button type="button" className="btn btn-save btn-new" onClick={onNewEvento}>
+          {/* <button type="button" className="btn btn-save btn-new" onClick={onNewEvento}>
             Criar novo evento
-          </button>
+          </button> */}
           <button
             type="button"
             className="btn btn-danger btn-new"
