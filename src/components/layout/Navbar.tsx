@@ -12,7 +12,7 @@ export default function Navbar({ searchTerm, onSearchChange, onLogout }: NavbarP
   return (
     <nav className="navbar">
       <div className="navbar-brand">
-        <span style={{ fontWeight: 600, fontSize: '1.1rem' }}>Gestão de Transporte & Logística</span>
+        <span>Gestão de Transporte & Logística</span>
       </div>
 
       <div className="navbar-navigation" aria-label="Navegação principal">
@@ -25,27 +25,21 @@ export default function Navbar({ searchTerm, onSearchChange, onLogout }: NavbarP
 
       <GlobalSearch value={searchTerm || ''} onChange={(term) => onSearchChange?.(term)} />
 
-      <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.95rem' }}>
-          <FaUserCircle size={22} color="#cbd5e0" />
+      <div className="navbar-actions">
+        <div className="navbar-user">
+          <FaUserCircle aria-hidden="true" />
           <span>Administrador</span>
         </div>
 
         {onLogout && (
-          <button 
-            onClick={onLogout} 
+          <button
+            type="button"
+            className="navbar-logout"
+            onClick={onLogout}
             title="Terminar Sessão"
-            style={{ 
-              background: 'transparent', 
-              border: 'none', 
-              color: '#e74c3c', 
-              cursor: 'pointer', 
-              fontSize: '1.2rem',
-              display: 'flex',
-              alignItems: 'center'
-            }}
+            aria-label="Terminar sessão"
           >
-            <FaSignOutAlt />
+            <FaSignOutAlt aria-hidden="true" />
           </button>
         )}
       </div>
