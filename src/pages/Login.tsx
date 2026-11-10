@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { apiAuth } from '../services/apiAuth';
+import { FiArrowLeft } from 'react-icons/fi';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -58,7 +59,7 @@ export default function Login() {
           {challenge ? <div className="form-group">
             <label htmlFor="login-code">Código do autenticador ou de recuperação</label>
             <input id="login-code" autoComplete="one-time-code" value={code} onChange={e => setCode(e.target.value)} required maxLength={100} />
-            <button type="button" onClick={() => { setChallenge(''); setCode(''); setErro(''); }}>Voltar ao login</button>
+            <button className="btn btn-cancel login-back-button" disabled={busy} type="button" onClick={() => { setChallenge(''); setCode(''); setErro(''); }}><FiArrowLeft aria-hidden="true" /> Voltar ao login</button>
           </div> : <>
           <div className="form-group">
             <label>E-mail:</label>
