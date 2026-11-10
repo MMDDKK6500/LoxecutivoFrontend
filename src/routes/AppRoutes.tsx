@@ -5,6 +5,7 @@ import Dashboard from '../pages/Dashboard';
 import Login from '../pages/Login';
 import Cadastros from '../pages/Cadastros';
 import Relatorios from '../pages/Relatorios';
+import Seguranca from '../pages/Seguranca';
 import { ToastProvider } from '../contexts/ToastContext';
 import ServiceHealthMonitor from '../components/layout/ServiceHealthMonitor';
 
@@ -31,6 +32,7 @@ export default function AppRoutes() {
       <ToastProvider>
         <ServiceHealthMonitor />
         <Routes>
+          <Route path="/seguranca" element={<PrivateRoute><Seguranca /></PrivateRoute>} />
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />

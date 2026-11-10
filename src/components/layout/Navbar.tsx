@@ -26,10 +26,10 @@ export default function Navbar({ searchTerm, onSearchChange, onLogout }: NavbarP
       <GlobalSearch value={searchTerm || ''} onChange={(term) => onSearchChange?.(term)} />
 
       <div className="navbar-actions">
-        <div className="navbar-user">
+        <NavLink to="/seguranca" className="navbar-user" style={{ color: 'inherit', textDecoration: 'none' }} title="Segurança da conta">
           <FaUserCircle aria-hidden="true" />
           <span>Administrador</span>
-        </div>
+        </NavLink>
 
         {onLogout && (
           <button

@@ -7,14 +7,26 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
+  const [challenge, setChallenge] = useState('');
+  const [code, setCode] = useState('');
+  const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro('');
+    if (busy) return;
+    setBusy(true);
 
     try {
-      const response = await apiAuth.post('/login', { email, senha });
+      const response = challenge
+        ? await apiAuth.post('/2fa/verify', { challengeToken: challenge, code })
+        : await apiAuth.post('/login', { email, senha });
+      if (response.data.requiresTwoFactor) {
+        setChallenge(response.data.challengeToken);
+        setSenha('');
+        return;
+      }
       if (response.data.auth && response.data.token) {
         localStorage.setItem('token', response.data.token);
         navigate('/'); // Redireciona para o Dashboard protegido
@@ -26,6 +38,8 @@ export default function Login() {
         ? error.response?.data?.message
         : undefined;
       setErro(message || 'Erro ao realizar login. Verifique as suas credenciais.');
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -41,6 +55,11 @@ export default function Login() {
         )}
 
         <form onSubmit={handleLogin}>
+          {challenge ? <div className="form-group">
+            <label htmlFor="login-code">Código do autenticador ou de recuperação</label>
+            <input id="login-code" autoComplete="one-time-code" value={code} onChange={e => setCode(e.target.value)} required maxLength={100} />
+            <button type="button" onClick={() => { setChallenge(''); setCode(''); setErro(''); }}>Voltar ao login</button>
+          </div> : <>
           <div className="form-group">
             <label>E-mail:</label>
             <input 
@@ -63,9 +82,10 @@ export default function Login() {
             />
           </div>
 
+          </>}
           <div className="form-actions" style={{ marginTop: '25px' }}>
-            <button type="submit" className="btn btn-save" style={{ width: '100%' }}>
-              Entrar
+            <button disabled={busy} type="submit" className="btn btn-save" style={{ width: '100%' }}>
+              {busy ? 'Verificando…' : challenge ? 'Confirmar código' : 'Entrar'}
             </button>
           </div>
         </form>
